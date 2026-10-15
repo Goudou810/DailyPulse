@@ -18,7 +18,7 @@ jobs:
           gradle-version: '8.9'
       - name: Ecrire le projet
         run: |
-          mkdir -p app/src/main/java/com/routine/app app/src/main/assets app/src/main/res/drawable app/src/main/res/mipmap-anydpi
+          mkdir -p app/src/main/java/com/routine/app app/src/main/assets app/src/main/res/drawable app/src/main/res/mipmap-anydpi app/src/main/res/layout app/src/main/res/xml
           cat > settings.gradle <<'EOF_0'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement { repositories { google(); mavenCentral() } }
@@ -64,6 +64,12 @@ jobs:
                           <action android:name="android.intent.action.BOOT_COMPLETED"/>
                       </intent-filter>
                   </receiver>
+                  <receiver android:name=".RoutineWidget" android:exported="false">
+                      <intent-filter>
+                          <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                      </intent-filter>
+                      <meta-data android:name="android.appwidget.provider" android:resource="@xml/routine_widget_info"/>
+                  </receiver>
               </application>
           </manifest>
           EOF_2
@@ -84,6 +90,7 @@ jobs:
                   public void save(String json) {
                       Sched.store(MainActivity.this, json);
                       Sched.all(MainActivity.this);
+                      RoutineWidget.refreshAll(MainActivity.this);
                   }
               }
 
@@ -211,7 +218,109 @@ jobs:
               }
           }
           EOF_4
-          cat > app/src/main/assets/index.html <<'EOF_5'
+          cat > app/src/main/java/com/routine/app/RoutineWidget.java <<'EOF_WIDGETJAVA'
+          package com.routine.app;
+
+          import android.app.PendingIntent;
+          import android.appwidget.AppWidgetManager;
+          import android.appwidget.AppWidgetProvider;
+          import android.content.ComponentName;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.widget.RemoteViews;
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+          import java.util.Calendar;
+
+          public class RoutineWidget extends AppWidgetProvider {
+              @Override
+              public void onUpdate(Context context, AppWidgetManager manager, int[] ids) {
+                  for (int id : ids) updateOne(context, manager, id);
+              }
+
+              public static void refreshAll(Context context) {
+                  AppWidgetManager manager = AppWidgetManager.getInstance(context);
+                  ComponentName component = new ComponentName(context, RoutineWidget.class);
+                  int[] ids = manager.getAppWidgetIds(component);
+                  for (int id : ids) updateOne(context, manager, id);
+              }
+
+              private static void updateOne(Context context, AppWidgetManager manager, int id) {
+                  RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.routine_widget);
+                  String title = "Film / Série / Jeu Vidéo";
+                  String time = "12:45 – 17:45";
+                  String status = "Ma routine";
+                  try {
+                      String raw = context.getSharedPreferences("r", 0).getString("d", "[]");
+                      JSONArray items = new JSONArray(raw);
+                      int now = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) * 60 + Calendar.getInstance().get(Calendar.MINUTE);
+                      JSONObject next = null;
+                      for (int i = 0; i < items.length(); i++) {
+                          JSONObject item = items.getJSONObject(i);
+                          String start = item.optString("s", "12:45");
+                          String end = item.optString("e", "17:45");
+                          int a = minutes(start), b = minutes(end);
+                          if (a <= now && now < b) { next = item; status = "En cours"; break; }
+                          if (a > now && (next == null || a < minutes(next.optString("s", "23:59")))) next = item;
+                      }
+                      if (next != null) {
+                          title = next.optString("t", title);
+                          time = next.optString("s", "12:45") + " – " + next.optString("e", "17:45");
+                          if ("Ma routine".equals(status)) status = "Prochaine activité";
+                      }
+                  } catch (Exception ignored) { }
+                  views.setTextViewText(R.id.widget_title, title);
+                  views.setTextViewText(R.id.widget_time, time);
+                  views.setTextViewText(R.id.widget_status, status);
+                  Intent open = new Intent(context, MainActivity.class);
+                  PendingIntent pending = PendingIntent.getActivity(context, 0, open,
+                          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                  views.setOnClickPendingIntent(R.id.widget_root, pending);
+                  manager.updateAppWidget(id, views);
+              }
+
+              private static int minutes(String value) {
+                  try { String[] p = value.split(":"); return Integer.parseInt(p[0]) * 60 + Integer.parseInt(p[1]); }
+                  catch (Exception e) { return 0; }
+              }
+          }
+          EOF_WIDGETJAVA
+          cat > app/src/main/res/layout/routine_widget.xml <<'EOF_WIDGETLAYOUT'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/widget_root"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="16dp"
+              android:gravity="center_vertical"
+              android:background="#172635">
+              <TextView android:id="@+id/widget_status"
+                  android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:text="Ma routine" android:textColor="#8FCFE3" android:textSize="12sp" />
+              <TextView android:id="@+id/widget_title"
+                  android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:text="Film / Série / Jeu Vidéo" android:textColor="#FFFFFF"
+                  android:textSize="18sp" android:textStyle="bold" android:maxLines="2" />
+              <TextView android:id="@+id/widget_time"
+                  android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:text="12:45 – 17:45" android:textColor="#C8D6E2" android:textSize="14sp"
+                  android:layout_marginTop="4dp" />
+          </LinearLayout>
+          EOF_WIDGETLAYOUT
+          cat > app/src/main/res/xml/routine_widget_info.xml <<'EOF_WIDGETINFO'
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:minWidth="220dp"
+              android:minHeight="90dp"
+              android:targetCellWidth="3"
+              android:targetCellHeight="2"
+              android:updatePeriodMillis="1800000"
+              android:initialLayout="@layout/routine_widget"
+              android:resizeMode="horizontal|vertical"
+              android:widgetCategory="home_screen" />
+          EOF_WIDGETINFO
+          cat > app/src/main/assets/index.html <<'EOF_5' 
           <!DOCTYPE html>
           <html lang="fr">
           <head>
