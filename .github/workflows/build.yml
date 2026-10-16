@@ -28,6 +28,8 @@ jobs:
           cat > app/build.gradle <<'EOF_1'
           plugins { id 'com.android.application' version '8.5.2' }
 
+          def ksFile = System.getenv('KS_FILE')
+
           android {
               namespace 'com.routine.app'
               compileSdk 34
@@ -35,8 +37,29 @@ jobs:
                   applicationId 'com.routine.app'
                   minSdk 26
                   targetSdk 34
-                  versionCode 2
-                  versionName '1.1'
+                  versionCode 100 + (System.getenv('VC') ?: '0').toInteger()
+                  versionName '1.2'
+              }
+              signingConfigs {
+                  release {
+                      if (ksFile) {
+                          storeFile file(ksFile)
+                          storeType 'PKCS12'
+                          storePassword System.getenv('KS_PASS')
+                          keyAlias System.getenv('KS_ALIAS')
+                          keyPassword System.getenv('KS_PASS')
+                      }
+                  }
+              }
+              buildTypes {
+                  release {
+                      minifyEnabled false
+                      if (ksFile) signingConfig signingConfigs.release
+                  }
+              }
+              lint {
+                  checkReleaseBuilds false
+                  abortOnError false
               }
           }
           EOF_1
@@ -47,6 +70,7 @@ jobs:
               <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
               <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
               <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32"/>
+              <uses-permission android:name="android.permission.INTERNET"/>
               <application
                   android:label="Ma routine"
                   android:icon="@mipmap/ic_launcher"
@@ -108,12 +132,21 @@ jobs:
           package com.routine.app;
 
           import android.app.Activity;
+          import android.content.Intent;
+          import android.net.Uri;
           import android.os.Build;
           import android.os.Bundle;
           import android.webkit.JavascriptInterface;
+          import android.webkit.WebResourceRequest;
+          import android.webkit.WebResourceResponse;
           import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          import java.io.ByteArrayInputStream;
+          import java.io.IOException;
+          import java.io.InputStream;
 
           public class MainActivity extends Activity {
+              static final String HOST = "appassets.androidplatform.net";
               WebView w;
 
               public class Bridge {
@@ -122,6 +155,24 @@ jobs:
                       Sched.store(MainActivity.this, json);
                       Sched.all(MainActivity.this);
                       RoutineWidget.refreshAll(MainActivity.this);
+                  }
+              }
+
+              WebResourceResponse asset(Uri u) {
+                  if (u == null || !HOST.equals(u.getHost())) return null;
+                  String p = u.getPath();
+                  if (p == null || p.length() < 2) p = "/index.html";
+                  try {
+                      InputStream in = getAssets().open(p.substring(1));
+                      String mime = p.endsWith(".html") ? "text/html"
+                              : p.endsWith(".js") ? "application/javascript"
+                              : p.endsWith(".css") ? "text/css"
+                              : p.endsWith(".png") ? "image/png"
+                              : "application/octet-stream";
+                      return new WebResourceResponse(mime, "utf-8", in);
+                  } catch (IOException e) {
+                      return new WebResourceResponse("text/plain", "utf-8", 404, "Not Found", null,
+                              new ByteArrayInputStream(new byte[0]));
                   }
               }
 
@@ -137,9 +188,28 @@ jobs:
                   getWindow().setNavigationBarColor(0xFF070B1C);
                   w.getSettings().setJavaScriptEnabled(true);
                   w.getSettings().setDomStorageEnabled(true);
+                  w.getSettings().setAllowFileAccess(false);
+                  w.getSettings().setAllowContentAccess(false);
+                  w.setWebViewClient(new WebViewClient() {
+                      @Override
+                      public WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest r) {
+                          return asset(r.getUrl());
+                      }
+
+                      @Override
+                      public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
+                          Uri u = r.getUrl();
+                          if (HOST.equals(u.getHost())) return false;
+                          try {
+                              startActivity(new Intent(Intent.ACTION_VIEW, u));
+                          } catch (Exception e) {
+                          }
+                          return true;
+                      }
+                  });
                   w.addJavascriptInterface(new Bridge(), "Android");
                   setContentView(w);
-                  w.loadUrl("file:///android_asset/index.html");
+                  w.loadUrl("https://" + HOST + "/index.html");
               }
 
               @Override
@@ -1401,6 +1471,19 @@ jobs:
           .b{flex:1;padding:12px;border:1px solid var(--ln);border-radius:14px;background:var(--sf)}
           .b.p{background:linear-gradient(90deg,var(--c1),var(--c2));border-color:transparent;font-weight:700}
           .note{margin-top:12px;color:var(--mu);font-size:13px}
+          .au{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(7,11,28,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow-y:auto}
+          .au.on{display:flex}
+          .ac{width:100%;max-width:380px;border:1px solid var(--ln);background:rgba(18,22,52,.85);border-radius:24px;padding:26px 22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+          .al{font-size:44px;filter:drop-shadow(0 0 14px var(--c1))}
+          .ac h2{margin:6px 0 4px;font-size:24px}
+          .ac .sub{margin:0 0 16px}
+          .ac input{display:block;width:100%;margin:0 0 10px;padding:13px 14px;border:1px solid var(--ln);background:rgba(255,255,255,.06);border-radius:14px;font-size:16px}
+          .ac .b{display:block;width:100%;margin-top:10px}
+          .lk{border:0;background:none;color:var(--c2);margin-top:14px;padding:6px;font-size:14px}
+          .am{min-height:20px;margin-top:12px;font-size:14px;color:#ff8a8a}
+          .am.ok{color:#7ee0b0}
+          .who{padding:8px 14px;font-size:13px;color:var(--ink);border-bottom:1px solid var(--ln);margin-bottom:4px;word-break:break-all}
+          .who small{display:block;color:var(--mu);font-size:11px;margin-top:2px}
           @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
           </style>
           </head>
@@ -1412,8 +1495,10 @@ jobs:
             <div><div class="hi" id="hi"></div><div class="dt" id="dt"></div></div>
             <button id="mb" aria-label="Menu"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg></button>
             <div class="menu" id="menu">
-             <button id="m1"><b>🗓️</b>Routine</button>
+             <div class="who" id="who" style="display:none"><div id="wm"></div><small id="sy"></small></div>
+              <button id="m1"><b>🗓️</b>Routine</button>
              <button id="m2"><b>➕</b>Ajouter un bloc</button>
+              <button id="m3" style="display:none"><b>🚪</b>Se déconnecter</button>
             </div>
            </div>
            <div class="stage">
@@ -1459,6 +1544,25 @@ jobs:
            </main>
           </div>
 
+          <div id="auth" class="au"><div class="ac">
+           <div class="al">⏱️</div>
+           <h2 id="at">Connexion</h2>
+           <p class="sub" id="as"></p>
+           <div id="af">
+            <input id="ae" type="email" placeholder="Email" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false">
+            <input id="ap" type="password" placeholder="Mot de passe (6 caractères minimum)" autocomplete="current-password">
+            <button class="b p" id="ago">Se connecter</button>
+            <button class="b" id="asw">Créer un compte</button>
+            <button class="lk" id="afg">Mot de passe oublié ?</button>
+           </div>
+           <div id="av" style="display:none">
+            <button class="b p" id="ach">J'ai vérifié mon email</button>
+            <button class="b" id="are">Renvoyer l'email</button>
+            <button class="lk" id="alo">Changer de compte</button>
+           </div>
+           <div class="am" id="am"></div>
+          </div></div>
+
           <script>
           const KEY="routine-v1";
           const DEF=[["06:00","06:30","Réveil"],["06:30","07:15","Anglais"],["07:15","07:45","Pause petit-déjeuner"],["07:45","08:45","Lecture"],["08:45","09:00","Pause"],["09:00","09:45","Anglais (écoute et pratique)"],["09:45","10:00","Pause"],["10:00","12:00","Trading"],["12:00","13:00","Pause déjeuner"],["13:00","14:30","Jeu vidéo"],["14:30","14:45","Pause"],["14:45","16:15","Série ou film"],["16:15","16:30","Pause"],["16:30","17:30","Lecture"],["17:30","18:30","Pause dîner"],["18:30","19:30","Série ou film"],["19:30","19:45","Pause"],["19:45","20:30","Lecture au calme"],["20:30","21:00","Bilan OODA"]];
@@ -1481,7 +1585,8 @@ jobs:
           const cat=t=>{t=(t||"").toLowerCase();for(const c of CATS)if(c.m.test(t))return c;return DEFC};
           const fresh=()=>DEF.map(([s,e,t])=>({s,e,t,n:true}));
           function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(d)&&d.length)return d}catch(e){}return fresh()}
-          function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}try{if(window.Android)Android.save(JSON.stringify(data))}catch(e){}}
+          function persist(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}try{if(window.Android)Android.save(JSON.stringify(data))}catch(e){}}
+          function save(){persist();wr(TS,String(Date.now()));queuePush()}
           function mk(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;return e}
           function inp(type,v,label){const e=mk("input");e.type=type;e.value=v||"";e.setAttribute("aria-label",label);return e}
           let data=load(),rows=[],curK="",litN=-1;
@@ -1583,7 +1688,147 @@ jobs:
            $("nxc").style.display=y?"":"none";
            if(y){const cy=cat(y.t);$("ne").textContent=cy.e;$("nn").textContent=y.t;$("nw").textContent="à "+y.s+" · durée "+fmt(mn(y.e)-mn(y.s))}
           }
-          render();save();showRt(location.hash==="#routine");
+          /* ---------- Compte + sauvegarde en ligne (Firebase, API REST) ---------- */
+          const FB_KEY="__FB_API_KEY__",FB_PROJ="__FB_PROJECT_ID__";
+          const CLOUD=/^AIza[\w-]{30,}$/.test(FB_KEY)&&/^[a-z0-9][a-z0-9-]{3,}$/.test(FB_PROJ);
+          const SES="routine-session",OWN="routine-owner",TS="routine-ts";
+          const IDT="https://identitytoolkit.googleapis.com/v1/accounts:";
+          const AUTH_BAD=/TOKEN_EXPIRED|USER_NOT_FOUND|USER_DISABLED|INVALID_REFRESH_TOKEN|CREDENTIAL_TOO_OLD|INVALID_GRANT/;
+          const ERR={EMAIL_EXISTS:"Cet email a déjà un compte.",EMAIL_NOT_FOUND:"Email ou mot de passe incorrect.",INVALID_PASSWORD:"Email ou mot de passe incorrect.",INVALID_LOGIN_CREDENTIALS:"Email ou mot de passe incorrect.",INVALID_EMAIL:"Email invalide.",MISSING_PASSWORD:"Entre ton mot de passe.",USER_DISABLED:"Ce compte est désactivé.",TOO_MANY_ATTEMPTS_TRY_LATER:"Trop d'essais. Réessaie dans quelques minutes.",OPERATION_NOT_ALLOWED:"Connexion par email désactivée dans Firebase."};
+          let ses=null,idTok="",idExp=0,pushT=0,busy=false,mode="login",lastPull=0;
+          function rd(k){try{return localStorage.getItem(k)}catch(e){return null}}
+          function wr(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}}
+          function errMsg(m){m=String(m||"");if(m.indexOf("WEAK_PASSWORD")===0)return"Mot de passe trop faible (6 caractères minimum).";const k=Object.keys(ERR).find(x=>m.indexOf(x)===0);return k?ERR[k]:"Erreur réseau ou serveur. Vérifie ta connexion."}
+          async function api(url,body){
+           const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","X-Firebase-Locale":"fr"},body:JSON.stringify(body)});
+           const j=await r.json().catch(()=>({}));
+           if(!r.ok)throw new Error((j.error&&j.error.message)||("HTTP"+r.status));
+           return j}
+          function setSes(j){
+           const o=ses||{};
+           ses={uid:j.localId||j.user_id||o.uid,email:j.email||o.email,rt:j.refreshToken||j.refresh_token||o.rt,ver:!!o.ver&&(!j.localId||j.localId===o.uid)};
+           idTok=j.idToken||j.id_token||"";idExp=Date.now()+((+j.expiresIn||+j.expires_in||3600)-60)*1000;
+           wr(SES,JSON.stringify(ses))}
+          async function token(force){
+           if(!ses)throw new Error("NOAUTH");
+           if(!force&&idTok&&Date.now()<idExp)return idTok;
+           const r=await fetch("https://securetoken.googleapis.com/v1/token?key="+FB_KEY,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"grant_type=refresh_token&refresh_token="+encodeURIComponent(ses.rt)});
+           const j=await r.json().catch(()=>({}));
+           if(!r.ok)throw new Error((j.error&&j.error.message)||("HTTP"+r.status));
+           setSes(j);return idTok}
+          async function isVerified(){
+           const t=await token(true);
+           const j=await api(IDT+"lookup?key="+FB_KEY,{idToken:t});
+           const u=j.users&&j.users[0];return !!(u&&u.emailVerified)}
+          function docUrl(){return"https://firestore.googleapis.com/v1/projects/"+FB_PROJ+"/databases/(default)/documents/users/"+ses.uid}
+          async function cloudGet(){
+           const t=await token();
+           const r=await fetch(docUrl(),{headers:{Authorization:"Bearer "+t}});
+           if(r.status===404)return null;
+           if(!r.ok)throw new Error("HTTP"+r.status);
+           const f=(await r.json()).fields||{};
+           return{routine:(f.routine&&f.routine.stringValue)||"",ts:+((f.ts&&f.ts.integerValue)||0)}}
+          async function cloudPut(){
+           const t=await token();
+           const ts=+rd(TS)||Date.now();
+           const r=await fetch(docUrl(),{method:"PATCH",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({fields:{routine:{stringValue:JSON.stringify(data)},ts:{integerValue:String(ts)}}})});
+           if(!r.ok)throw new Error("HTTP"+r.status)}
+          function setSync(t){$("sy").textContent=t||""}
+          function updWho(){$("who").style.display=ses?"":"none";$("m3").style.display=ses?"":"none";$("wm").textContent=ses?ses.email:""}
+          function queuePush(){
+           if(!CLOUD||!ses||!ses.ver)return;
+           clearTimeout(pushT);
+           pushT=setTimeout(async()=>{pushT=0;try{await cloudPut();setSync("✓ Sauvegardé en ligne")}catch(e){setSync("⚠ Pas encore sauvegardé en ligne")}},1500)}
+          async function pull(){
+           lastPull=Date.now();
+           let c=null;
+           try{c=await cloudGet()}catch(e){setSync(/403/.test(String(e.message))?"⚠ Accès refusé (règles Firestore)":"⚠ Hors ligne : données locales");return}
+           const lts=+rd(TS)||0,own=rd(OWN);
+           try{
+            if(c&&c.routine){
+             if(own===ses.uid&&lts>c.ts)await cloudPut();
+             else{const d=JSON.parse(c.routine);if(Array.isArray(d)){data=d;wr(TS,String(c.ts));persist();render()}}
+            }else{
+             if(own!==ses.uid){data=fresh();wr(TS,String(Date.now()))}
+             persist();render();await cloudPut()}
+            wr(OWN,ses.uid);setSync("✓ Synchronisé")
+           }catch(e){setSync("⚠ Synchronisation impossible")}}
+          function msg(t,ok){const m=$("am");m.textContent=t||"";m.className="am"+(ok?" ok":"")}
+          function setMode(m){
+           mode=m;const s=m==="signup";
+           $("at").textContent=s?"Créer un compte":"Connexion";
+           $("as").textContent=s?"Ton email servira à confirmer le compte.":"Connecte-toi pour retrouver ta routine sur tous tes appareils.";
+           $("ago").textContent=s?"S'inscrire":"Se connecter";
+           $("asw").textContent=s?"J'ai déjà un compte":"Créer un compte";
+           $("afg").style.display=s?"none":"";
+           $("ap").setAttribute("autocomplete",s?"new-password":"current-password")}
+          function showAuth(v){
+           $("auth").classList.toggle("on",!!v);
+           $("af").style.display=v==="login"?"":"none";
+           $("av").style.display=v==="verify"?"":"none";
+           if(v==="login")setMode(mode);
+           if(v==="verify"){$("at").textContent="Vérifie ton email";$("as").textContent="Un email de confirmation a été envoyé à "+(ses?ses.email:"")+". Clique sur le lien dans l'email, puis reviens ici."}
+           msg("")}
+          async function enter(){ses.ver=true;wr(SES,JSON.stringify(ses));showAuth("");updWho();await pull()}
+          async function submit(){
+           if(busy)return;
+           const em=$("ae").value.trim(),pw=$("ap").value;
+           if(!em||!pw){msg("Entre ton email et ton mot de passe.");return}
+           busy=true;msg("Un instant…",true);
+           try{
+            if(mode==="signup"){
+             const j=await api(IDT+"signUp?key="+FB_KEY,{email:em,password:pw,returnSecureToken:true});
+             ses=null;setSes(j);
+             showAuth("verify");
+             try{await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"VERIFY_EMAIL",idToken:idTok});msg("Email envoyé. Pense à regarder tes spams.",true)}
+             catch(e2){msg("Compte créé, mais l'email n'a pas pu être envoyé. Touche « Renvoyer l'email ».")}
+            }else{
+             const j=await api(IDT+"signInWithPassword?key="+FB_KEY,{email:em,password:pw,returnSecureToken:true});
+             ses=null;setSes(j);
+             if(await isVerified())await enter();
+             else{showAuth("verify");msg("Ton email n'est pas encore vérifié. Touche « Renvoyer l'email » si besoin.")}
+            }
+           }catch(e){msg(errMsg(e.message))}
+           busy=false}
+          async function checkVer(){
+           if(busy)return;busy=true;msg("Vérification…",true);
+           try{if(await isVerified())await enter();else msg("Pas encore vérifié. Ouvre le lien reçu par email, puis réessaie.")}
+           catch(e){msg(errMsg(e.message))}
+           busy=false}
+          async function resend(){
+           if(busy)return;busy=true;
+           try{const t=await token();await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"VERIFY_EMAIL",idToken:t});msg("Email renvoyé à "+ses.email+".",true)}
+           catch(e){msg(errMsg(e.message))}
+           busy=false}
+          async function forgot(){
+           const em=$("ae").value.trim();
+           if(!em){msg("Entre d'abord ton email ci-dessus.");return}
+           try{await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"PASSWORD_RESET",email:em});msg("Si ce compte existe, un email de réinitialisation a été envoyé.",true)}
+           catch(e){if(String(e.message).indexOf("EMAIL_NOT_FOUND")===0)msg("Si ce compte existe, un email de réinitialisation a été envoyé.",true);else msg(errMsg(e.message))}}
+          async function logout(){
+           try{if(ses&&ses.ver&&pushT){clearTimeout(pushT);pushT=0;await cloudPut()}}catch(e){}
+           ses=null;idTok="";wr(SES,null);wr(OWN,null);wr(TS,null);wr(KEY,null);
+           data=[];persist();render();updWho();setSync("");closeMenu();$("ap").value="";showAuth("login")}
+          async function authInit(){
+           if(!CLOUD)return;
+           let s=null;try{s=JSON.parse(rd(SES))}catch(e){}
+           if(s&&s.uid&&s.rt)ses=s;
+           if(!ses||!ses.ver){data=[];persist();render();showAuth(ses?"verify":"login");return}
+           updWho();
+           try{
+            if(await isVerified())await pull();
+            else{ses.ver=false;wr(SES,JSON.stringify(ses));data=[];persist();render();showAuth("verify")}
+           }catch(e){if(AUTH_BAD.test(String(e.message)))logout();else setSync("⚠ Hors ligne : données locales")}}
+          $("ago").onclick=submit;
+          $("asw").onclick=()=>{setMode(mode==="signup"?"login":"signup");msg("")};
+          $("afg").onclick=forgot;
+          $("ach").onclick=checkVer;
+          $("are").onclick=resend;
+          $("alo").onclick=()=>logout();
+          $("m3").onclick=()=>logout();
+          $("ap").addEventListener("keydown",e=>{if(e.key==="Enter")submit()});
+          document.addEventListener("visibilitychange",()=>{if(!document.hidden&&CLOUD&&ses&&ses.ver&&!pushT&&Date.now()-lastPull>30000)pull()});
+          render();persist();showRt(location.hash==="#routine");authInit();
           setInterval(()=>{tick();home()},1000);
           </script>
           </body>
@@ -1643,12 +1888,57 @@ jobs:
               <foreground android:drawable="@drawable/ic_fg"/>
           </adaptive-icon>
           EOF_8
+      - name: Configurer Firebase (comptes en ligne)
+        env:
+          FB_API_KEY: ${{ vars.FB_API_KEY }}
+          FB_PROJECT_ID: ${{ vars.FB_PROJECT_ID }}
+        run: |
+          python3 - <<'PY'
+          import os
+          p = "app/src/main/assets/index.html"
+          t = open(p, encoding="utf-8").read()
+          t = t.replace("__FB_API_KEY__", os.environ.get("FB_API_KEY", "").strip())
+          t = t.replace("__FB_PROJECT_ID__", os.environ.get("FB_PROJECT_ID", "").strip())
+          open(p, "w", encoding="utf-8").write(t)
+          PY
+      - name: Version web (GitHub Pages)
+        continue-on-error: true
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/src/main/assets
+      - name: Cle de signature
+        env:
+          KS_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -z "$KS_B64" ]; then
+            echo "::error::Secret KEYSTORE_B64 manquant. Ajoute les secrets KEYSTORE_B64 et KEYSTORE_PASSWORD (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          echo "$KS_B64" | tr -d ' \n\r' | base64 -d > "$RUNNER_TEMP/routine.p12"
       - name: Compiler
-        run: gradle assembleDebug --no-daemon
+        env:
+          KS_FILE: ${{ runner.temp }}/routine.p12
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KS_ALIAS: routine
+          VC: ${{ github.run_number }}
+        run: gradle assembleRelease --no-daemon
       - name: Publier l'APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk routine.apk
+          cp app/build/outputs/apk/release/app-release.apk routine.apk
           gh release delete apk -y --cleanup-tag || true
           gh release create apk routine.apk --title "Ma routine" --notes "APK de Ma routine"
+  pages:
+    needs: apk
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
