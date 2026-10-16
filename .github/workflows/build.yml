@@ -622,6 +622,7 @@ jobs:
               private Canvas cv;
               private float d, Wd, Hd;
               private WidgetModel.State st;
+              private int[] th;
               private final Typeface BOLD = Typeface.create("sans-serif", Typeface.BOLD);
               private final Typeface MED = Typeface.create("sans-serif-medium", Typeface.NORMAL);
               private final Typeface REG = Typeface.create("sans-serif", Typeface.NORMAL);
@@ -639,6 +640,7 @@ jobs:
                   WidgetArt a = new WidgetArt();
                   a.cv = new Canvas(bmp);
                   a.st = st;
+                  a.th = TH[Math.max(0, Math.min(8, st.cat))];
                   a.d = density * f * k;
                   a.Wd = w / a.d;
                   a.Hd = h / a.d;
@@ -651,7 +653,7 @@ jobs:
                       case COMPACT: a.v5(); break;
                       default: a.hero(); break;
                   }
-                  a.finish(RAD[style], style == MINI ? 0x55607BFF : 0x33FFFFFF);
+                  a.finish(RAD[style], style == MINI ? al(a.th[3], 0x66) : 0x33FFFFFF);
                   return bmp;
               }
 
@@ -918,162 +920,306 @@ jobs:
                   cv.restore();
               }
 
+              // ---------- thèmes par mode ----------
+              // {fond0, fond1, fond2, accent A, accent B, lueur 1, lueur 2} indexé par catégorie
+              static final int[][] TH = {
+                  /* GENERIC */ {0xFF081028, 0xFF0E1F5C, 0xFF1B2A8C, 0xFF60A5FA, 0xFF818CF8, 0x883B6BFF, 0x666B8CFF},
+                  /* GAME    */ {0xFF070B1C, 0xFF0C1330, 0xFF150F3E, 0xFFB06BFF, 0xFF3B8CFF, 0x883D2BFF, 0x66E91E8C},
+                  /* FILM    */ {0xFF120706, 0xFF2A0E06, 0xFF4A1A06, 0xFFFFB347, 0xFFFF6A00, 0x99FF7A1A, 0x66FF3D2B},
+                  /* TRADE   */ {0xFF04140F, 0xFF062A22, 0xFF08354A, 0xFF34E0A1, 0xFF19A6FF, 0x8800C896, 0x6619A6FF},
+                  /* READ    */ {0xFF140D05, 0xFF2A1A0A, 0xFF40260C, 0xFFFFD166, 0xFFEF8354, 0x88FFB03A, 0x66EF8354},
+                  /* LANG    */ {0xFF14061C, 0xFF2A0C3A, 0xFF3A1458, 0xFFFF6BD6, 0xFF6B8CFF, 0x88FF4FD0, 0x666B8CFF},
+                  /* PAUSE   */ {0xFF041418, 0xFF06303A, 0xFF0A4A52, 0xFF5EEAD4, 0xFF38BDF8, 0x8833D6C0, 0x6638BDF8},
+                  /* WAKE    */ {0xFF1A0C1E, 0xFF4A1A3A, 0xFF7A2A2A, 0xFFFFD36B, 0xFFFF7A59, 0xAAFF9A3D, 0x66FF5A8A},
+                  /* REVIEW  */ {0xFF0A0A24, 0xFF161645, 0xFF22226A, 0xFFA78BFA, 0xFF6366F1, 0x886366F1, 0x66A78BFA}
+              };
+
+              static int al(int c, int a) { return (c & 0x00FFFFFF) | (a << 24); }
+
+              static int mix(int c1, int c2, float t) {
+                  int r = Math.round(((c1 >> 16) & 255) * (1 - t) + ((c2 >> 16) & 255) * t);
+                  int g = Math.round(((c1 >> 8) & 255) * (1 - t) + ((c2 >> 8) & 255) * t);
+                  int b = Math.round((c1 & 255) * (1 - t) + (c2 & 255) * t);
+                  return 0xFF000000 | (r << 16) | (g << 8) | b;
+              }
+
+              int onAcc() {
+                  int a = th[3];
+                  float l = (0.299f * ((a >> 16) & 255) + 0.587f * ((a >> 8) & 255) + 0.114f * (a & 255)) / 255f;
+                  return l > 0.62f ? 0xFF1A1205 : 0xFFFFFFFF;
+              }
+
+              // Décor propre à chaque mode, dessiné dans une boîte s x s centrée en (cx, cy)
+              void scene(int cat, float cx, float cy, float s) {
+                  if (cat == WidgetModel.GAME) {
+                      controller(cx, cy, s * 1.25f / 200f, -9f);
+                      return;
+                  }
+                  cv.save();
+                  cv.translate(cx - s / 2f, cy - s / 2f);
+                  float g = s / 100f;
+                  cv.scale(g, g);
+                  int A = th[3], B = th[4], W = 0xFFFFFFFF;
+                  switch (cat) {
+                      case WidgetModel.FILM: {
+                          glow(50, 38, 52, al(A, 0x66));
+                          cv.drawRoundRect(new RectF(8, 10, 92, 60), 5, 5, fill(0xFF0B0504));
+                          Paint sc = fill(W);
+                          lg(sc, 8, 10, 92, 60, mix(A, W, 0.35f), B);
+                          cv.drawRoundRect(new RectF(12, 14, 88, 56), 3, 3, sc);
+                          cv.drawRoundRect(new RectF(2, 70, 98, 106), 14, 14, fill(0xFF140806));
+                          cv.drawCircle(50f, 62f, 8f, fill(0xFF050202));
+                          cv.drawRoundRect(new RectF(36, 69, 64, 106), 12, 12, fill(0xFF050202));
+                          break;
+                      }
+                      case WidgetModel.TRADE: {
+                          glow(50, 50, 55, al(A, 0x44));
+                          Paint gr = stroke(0x22FFFFFF, 0.8f);
+                          for (int i = 0; i < 4; i++) cv.drawLine(4, 20 + i * 20, 96, 20 + i * 20, gr);
+                          float[][] c = {{60, 88, 66, 82, 0}, {52, 84, 58, 78, 1}, {44, 74, 50, 68, 1},
+                                  {46, 70, 52, 64, 0}, {30, 62, 36, 56, 1}, {16, 48, 22, 42, 1}};
+                          for (int i = 0; i < c.length; i++) {
+                              float x = 14 + i * 14.4f;
+                              int col = c[i][4] > 0 ? 0xFF34E0A1 : 0xFFFF5C7A;
+                              cv.drawLine(x, c[i][0], x, c[i][1], stroke(col, 1.6f));
+                              cv.drawRoundRect(new RectF(x - 4, c[i][2], x + 4, c[i][3]), 1.5f, 1.5f, fill(col));
+                          }
+                          Paint gl = blur(stroke(W, 4f), 4);
+                          lg(gl, 6, 0, 94, 0, A, B);
+                          cv.drawPath(path("M 8 80 L 28 68 L 46 58 L 62 52 L 80 32 L 94 18"), gl);
+                          Paint ln = stroke(W, 2.2f);
+                          lg(ln, 6, 0, 94, 0, A, B);
+                          cv.drawPath(path("M 8 80 L 28 68 L 46 58 L 62 52 L 80 32 L 94 18"), ln);
+                          cv.drawPath(path("M 85 17 L 94 18 L 91 26"), ln);
+                          break;
+                      }
+                      case WidgetModel.READ: {
+                          glow(50, 40, 55, al(A, 0x77));
+                          Paint pg = fill(W);
+                          lg(pg, 0, 30, 0, 86, mix(A, W, 0.8f), mix(A, 0xFF000000, 0.1f));
+                          cv.drawPath(path("M 50 34 C 38 26 20 26 6 31 L 6 82 C 20 78 38 78 50 86 Z"), pg);
+                          cv.drawPath(path("M 50 34 C 62 26 80 26 94 31 L 94 82 C 80 78 62 78 50 86 Z"), pg);
+                          cv.drawLine(50, 34, 50, 86, stroke(0x66000000, 1.4f));
+                          Paint tl = stroke(0x33000000, 1.4f);
+                          for (int i = 0; i < 4; i++) {
+                              float y = 42 + i * 9;
+                              cv.drawLine(14, y, 42, y, tl);
+                              cv.drawLine(58, y, 86, y, tl);
+                          }
+                          cv.drawCircle(22f, 14f, 2.2f, blur(fill(W), 2));
+                          cv.drawCircle(78f, 10f, 1.8f, blur(fill(W), 2));
+                          cv.drawCircle(50f, 8f, 2.4f, blur(fill(W), 2));
+                          break;
+                      }
+                      case WidgetModel.LANG: {
+                          glow(50, 50, 52, al(A, 0x55));
+                          Paint b1 = fill(W);
+                          lg(b1, 6, 12, 66, 44, A, mix(A, B, 0.5f));
+                          cv.drawRoundRect(new RectF(6, 12, 66, 44), 12, 12, b1);
+                          cv.drawPath(path("M 16 42 L 14 54 L 28 42 Z"), fill(A));
+                          Paint b2 = fill(W);
+                          lg(b2, 34, 52, 94, 84, mix(A, B, 0.5f), B);
+                          cv.drawRoundRect(new RectF(34, 52, 94, 84), 12, 12, b2);
+                          cv.drawPath(path("M 84 82 L 88 94 L 72 82 Z"), fill(B));
+                          txt("Hello", 36, 28, tp(W, 14, BOLD, CENTER));
+                          txt("Bonjour", 64, 68, tp(W, 12, BOLD, CENTER));
+                          break;
+                      }
+                      case WidgetModel.PAUSE: {
+                          glow(50, 56, 52, al(A, 0x66));
+                          Paint cup = fill(W);
+                          lg(cup, 0, 44, 0, 90, W, mix(A, W, 0.4f));
+                          cv.drawPath(path("M 22 44 L 68 44 L 68 66 C 68 80 58 88 45 88 C 32 88 22 80 22 66 Z"), cup);
+                          cv.drawPath(path("M 68 50 L 76 50 C 90 50 90 72 76 72 L 66 72"), stroke(W, 4f));
+                          cv.drawRoundRect(new RectF(12, 90, 80, 95), 2.5f, 2.5f, fill(al(A, 0xCC)));
+                          String[] sm = {"M 34 36 C 30 28 38 24 34 14", "M 46 36 C 42 28 50 24 46 12", "M 58 36 C 54 28 62 24 58 14"};
+                          for (String q : sm) {
+                              cv.drawPath(path(q), blur(stroke(al(W, 0x99), 4f), 3));
+                              cv.drawPath(path(q), stroke(al(W, 0xCC), 2.4f));
+                          }
+                          break;
+                      }
+                      case WidgetModel.WAKE: {
+                          glow(50, 62, 60, al(A, 0x88));
+                          Paint sun = fill(W);
+                          lg(sun, 0, 38, 0, 86, A, B);
+                          cv.drawPath(path("M 26 66 C 26 34 74 34 74 66 Z"), sun);
+                          Paint ry = stroke(A, 2.6f);
+                          for (int i = 0; i < 7; i++) {
+                              float an = (float) Math.PI + i * (float) Math.PI / 6f;
+                              float co = (float) Math.cos(an), si = (float) Math.sin(an);
+                              cv.drawLine(50 + 32 * co, 62 + 32 * si, 50 + 42 * co, 62 + 42 * si, ry);
+                          }
+                                          cv.drawLine(10, 70, 90, 70, stroke(al(A, 0xAA), 1.8f));
+                          cv.drawLine(24, 79, 76, 79, stroke(al(A, 0x77), 1.6f));
+                          cv.drawLine(36, 88, 64, 88, stroke(al(A, 0x55), 1.4f));
+                          break;
+                      }
+                      case WidgetModel.REVIEW: {
+                          glow(50, 50, 54, al(A, 0x66));
+                          cv.drawCircle(50f, 50f, 38f, fill(al(A, 0x33)));
+                          cv.drawCircle(50f, 50f, 38f, stroke(A, 3f));
+                          cv.drawCircle(50f, 50f, 26f, stroke(mix(A, B, 0.5f), 3f));
+                          cv.drawCircle(50f, 50f, 14f, stroke(B, 3f));
+                          cv.drawCircle(50f, 50f, 4f, fill(W));
+                          Paint ar = stroke(W, 3f);
+                          cv.drawLine(50, 50, 86, 14, ar);
+                          cv.drawPath(path("M 86 14 L 95 13 M 86 14 L 87 5"), ar);
+                          break;
+                      }
+                      default: {
+                          glow(50, 50, 52, al(A, 0x55));
+                          cv.drawCircle(50f, 50f, 36f, fill(0x14FFFFFF));
+                          cv.drawCircle(50f, 50f, 36f, stroke(A, 3f));
+                          Paint tk = stroke(al(W, 0xAA), 2f);
+                          for (int i = 0; i < 12; i++) {
+                              float an = i * (float) Math.PI / 6f;
+                              float co = (float) Math.cos(an), si = (float) Math.sin(an);
+                              cv.drawLine(50 + 29 * co, 50 + 29 * si, 50 + 33 * co, 50 + 33 * si, tk);
+                          }
+                          Paint hd = stroke(W, 3.4f);
+                          cv.drawLine(50, 50, 50, 28, hd);
+                          cv.drawLine(50, 50, 66, 58, hd);
+                          cv.drawCircle(50f, 50f, 3f, fill(B));
+                      }
+                  }
+                  cv.restore();
+              }
+
               // ---------- styles ----------
               void hero() {
-                  bg(0xFF070B1C, 0xFF0C1330, 0xFF150F3E);
-                  glow(Wd * 0.80f, Hd * 0.45f, Wd * 0.38f, 0x883D2BFF);
-                  glow(Wd * 0.97f, Hd * 0.92f, Wd * 0.28f, 0x66E91E8C);
-                  RectF vb = new RectF(Wd * 0.60f, 0, Wd * 0.60f + 4, Hd * 0.45f);
-                  cv.drawRoundRect(vb, 2, 2, blur(fill(0xFF2D8CFF), 4));
-                  cv.drawRoundRect(vb, 2, 2, fill(0xFF8CC4FF));
-                  RectF hb = new RectF(Wd * 0.68f, Hd * 0.30f, Wd * 0.92f, Hd * 0.30f + 4);
-                  cv.drawRoundRect(hb, 2, 2, blur(fill(0xFFFF3D9A), 4));
-                  cv.drawRoundRect(hb, 2, 2, fill(0xFFFF9CCB));
+                  bg(th[0], th[1], th[2]);
+                  glow(Wd * 0.80f, Hd * 0.45f, Wd * 0.38f, th[5]);
+                  glow(Wd * 0.97f, Hd * 0.92f, Wd * 0.28f, th[6]);
                   for (int i = 0; i < 4; i++) {
                       float x0 = Wd - 118 + i * 14;
                       Path q = path("M " + (x0 + 6) + " 10 L " + (x0 + 14) + " 10 L " + (x0 + 8) + " 22 L " + x0 + " 22 Z");
-                      cv.drawPath(q, fill(0x30B06BFF + (i * 0x10000000)));
+                      cv.drawPath(q, fill(al(th[3], 0x30 + i * 0x10)));
                   }
-                  controller(Wd * 0.80f, Hd * 0.54f, Math.min(Wd * 0.42f / 200f, Hd * 0.64f / 130f), -9f);
+                  scene(st.cat, Wd * 0.83f, Hd * 0.52f, Math.min(Wd * 0.34f, Hd * 0.74f));
                   header(14, 20, 18, 15, 0xFFFFFFFF, true);
                   float cy = (Hd + 4) / 2f, cx = 53f;
-                  ring(cx, cy, 35f, 6f, st.progress, 0xFFB06BFF, 0xFF3B8CFF, 0x553B2A8A, true);
+                  ring(cx, cy, 35f, 6f, st.progress, th[3], th[4], 0x33FFFFFF, true);
                   int ik = iconFor(st.cat);
-                  icon(ik, cx, cy, 38, 0xFFB06BFF, 0xFF3B8CFF, 2.4f);
-                  icon(ik, cx, cy, 38, 0xFFD9C2FF, 0xFF8FC0FF, 1.7f);
+                  icon(ik, cx, cy, 38, th[3], th[4], 2.4f);
+                  icon(ik, cx, cy, 38, mix(th[3], 0xFFFFFFFF, 0.6f), mix(th[4], 0xFFFFFFFF, 0.5f), 1.7f);
                   float tx = 106f;
                   String pt = st.active ? "En cours · " + st.pill : st.pill;
-                  pill(tx, cy - 27, 22, pt, 12f, 0x664B2FB8, 0x664B2FB8, 0xFFCDBBFF, iconFor(st.cat), 0x66A58BFF);
+                  pill(tx, cy - 27, 22, pt, 12f, al(th[3], 0x44), al(th[3], 0x44), mix(th[3], 0xFFFFFFFF, 0.55f), ik, al(th[3], 0x88));
                   Paint tt = tp(0xFFFFFFFF, 26, BOLD, LEFT);
-                  txt(fit(st.title, tt, Wd * 0.64f - tx), tx, cy + 2, tt);
-                  clockRow(tx, cy + 30, 15, 16, 0xFFDDE3FF);
-                  Paint tg = tp(0xFFB9C4FF, 12.5f, REG, LEFT);
+                  txt(fit(st.title, tt, Wd * 0.70f - tx), tx, cy + 2, tt);
+                  clockRow(tx, cy + 30, 15, 16, 0xFFEEF0FF);
+                  Paint tg = tp(mix(th[3], 0xFFFFFFFF, 0.65f), 12.5f, REG, LEFT);
                   String tag = fit(st.tagline, tg, Wd * 0.72f - 40);
                   txt(tag, 14, Hd - 16, tg);
-                  icon(I_TARGET, 14 + tg.measureText(tag) + 12, Hd - 16, 15, 0xFFB06BFF, 0xFF3B8CFF, 1.8f);
+                  icon(I_TARGET, 14 + tg.measureText(tag) + 12, Hd - 16, 15, th[3], th[4], 1.8f);
+              }
+
+              void card(float artX, float artY, float artS) {
+                  bg(th[0], th[1], th[2]);
+                  glow(Wd * 0.85f, Hd * 0.45f, Wd * 0.5f, th[5]);
+                  glow(Wd * 0.1f, Hd * 1.0f, Wd * 0.4f, th[6]);
+                  scene(st.cat, artX, artY, artS);
+              }
+
+              void tile(float cy, float sz) {
+                  RectF tile = new RectF(12, cy - sz / 2, 12 + sz, cy + sz / 2);
+                  Paint tl = fill(0xFFFFFFFF);
+                  lg(tl, 12, cy + sz / 2, 12 + sz, cy - sz / 2, th[3], th[4]);
+                  cv.drawRoundRect(tile, 11, 11, tl);
+                  icon(iconFor(st.cat), 12 + sz / 2, cy, sz * 0.62f, onAcc(), onAcc(), 1.8f);
               }
 
               void v1() {
-                  bg(0xFF0A0E24, 0xFF121545, 0xFF1B1058);
-                  glow(Wd * 0.9f, Hd * 0.1f, Wd * 0.4f, 0x553D2BFF);
-                  cv.drawPath(path("M " + (Wd - 84) + " 0 L " + (Wd - 40) + " 0 L " + (Wd - 70) + " 40 L " + (Wd - 114) + " 40 Z"), fill(0x44B06BFF));
-                  cv.drawPath(path("M " + (Wd - 52) + " 0 L " + (Wd - 24) + " 0 L " + (Wd - 46) + " 28 L " + (Wd - 74) + " 28 Z"), fill(0x663B8CFF));
-                  cv.drawPath(path("M " + (Wd - 110) + " " + Hd + " C " + (Wd - 60) + " " + (Hd - 6) + " " + (Wd - 20) + " " + (Hd - 30) + " " + Wd + " " + (Hd - 58) + " L " + Wd + " " + Hd + " Z"), fill(0x773B6BFF));
-                  cv.drawPath(path("M " + (Wd - 70) + " " + Hd + " C " + (Wd - 40) + " " + (Hd - 4) + " " + (Wd - 14) + " " + (Hd - 18) + " " + Wd + " " + (Hd - 34) + " L " + Wd + " " + Hd + " Z"), fill(0x88B06BFF));
+                  card(Wd - 30, 56f, 52f);
+                  cv.drawPath(path("M " + (Wd - 84) + " 0 L " + (Wd - 40) + " 0 L " + (Wd - 70) + " 40 L " + (Wd - 114) + " 40 Z"), fill(al(th[3], 0x33)));
+                  cv.drawPath(path("M " + (Wd - 52) + " 0 L " + (Wd - 24) + " 0 L " + (Wd - 46) + " 28 L " + (Wd - 74) + " 28 Z"), fill(al(th[4], 0x55)));
+                  cv.drawPath(path("M " + (Wd - 110) + " " + Hd + " C " + (Wd - 60) + " " + (Hd - 6) + " " + (Wd - 20) + " " + (Hd - 30) + " " + Wd + " " + (Hd - 58) + " L " + Wd + " " + Hd + " Z"), fill(al(th[4], 0x66)));
+                  cv.drawPath(path("M " + (Wd - 70) + " " + Hd + " C " + (Wd - 40) + " " + (Hd - 4) + " " + (Wd - 14) + " " + (Hd - 18) + " " + Wd + " " + (Hd - 34) + " L " + Wd + " " + Hd + " Z"), fill(al(th[3], 0x77)));
                   header(12, 18, 15, 12, 0xFFFFFFFF, true);
-                  icon(I_CROWN, Wd - 36, 52, 30, 0x55FFFFFF, 0x55FFFFFF, 1.3f);
-                  RectF tile = new RectF(12, 36, 54, 78);
-                  Paint tl = fill(0xFFFFFFFF);
-                  lg(tl, 12, 78, 54, 36, 0xFF7B4DFF, 0xFF3B8CFF);
-                  cv.drawRoundRect(tile, 11, 11, tl);
-                  icon(iconFor(st.cat), 33, 57, 26, 0xFFFFFFFF, 0xFFFFFFFF, 1.8f);
+                  tile(57, 42);
                   Paint tt = tp(0xFFFFFFFF, 16, BOLD, LEFT);
-                  txt(fit(st.title, tt, Wd - 64 - 46), 64, 50, tt);
-                  clockRow(64, 70, 12, 11.5f, 0xFFDDE3FF);
+                  txt(fit(st.title, tt, Wd - 64 - 52), 64, 50, tt);
+                  clockRow(64, 70, 12, 11.5f, 0xFFEEF0FF);
                   float by = Hd - 38;
                   Paint lab = tp(0xFFFFFFFF, 11, BOLD, RIGHT);
                   float lw = lab.measureText(st.pill);
                   RectF track = new RectF(12, by - 3, Wd - 20 - lw, by + 3);
-                  cv.drawRoundRect(track, 3, 3, fill(0x442A2F6A));
+                  cv.drawRoundRect(track, 3, 3, fill(0x44000000));
                   if (st.progress > 0.01f) {
-                      RectF fl = new RectF(12, by - 3, 12 + (track.width()) * st.progress, by + 3);
+                      RectF fl = new RectF(12, by - 3, 12 + track.width() * st.progress, by + 3);
                       Paint fp = fill(0xFFFFFFFF);
-                      lg(fp, 12, 0, track.right, 0, 0xFFB06BFF, 0xFF3B8CFF);
+                      lg(fp, 12, 0, track.right, 0, th[3], th[4]);
                       cv.drawRoundRect(fl, 3, 3, fp);
                   }
                   txt(st.pill, Wd - 12, by, lab);
-                  Paint mo = tp(0xFFB78BFF, 22, SCRIPT, LEFT);
-                  String mt = st.motto;
-                  txt(mt, 12, Hd - 16, mo);
-                  icon(iconFor(st.cat), 12 + mo.measureText(mt) + 14, Hd - 16, 15, 0xFFB78BFF, 0xFF6BA8FF, 1.8f);
+                  Paint mo = tp(mix(th[3], 0xFFFFFFFF, 0.25f), 22, SCRIPT, LEFT);
+                  txt(st.motto, 12, Hd - 16, mo);
+                  icon(iconFor(st.cat), 12 + mo.measureText(st.motto) + 14, Hd - 16, 15, th[3], th[4], 1.8f);
               }
 
               void v2() {
-                  bg(0xFF120706, 0xFF2A0E06, 0xFF4A1A06);
-                  glow(Wd * 0.80f, Hd * 0.42f, Wd * 0.55f, 0x99FF7A1A);
-                  RectF tv = new RectF(Wd * 0.56f, 30, Wd + 8, 78);
-                  cv.drawRoundRect(tv, 4, 4, fill(0xFF0B0504));
-                  Paint sc = fill(0xFFFFFFFF);
-                  lg(sc, tv.left, tv.top, tv.right, tv.bottom, 0xFFFFC27A, 0xFFB5400F);
-                  cv.drawRoundRect(new RectF(tv.left + 3, tv.top + 3, tv.right - 3, tv.bottom - 3), 3, 3, sc);
-                  cv.drawRoundRect(new RectF(Wd * 0.50f, Hd - 36, Wd + 12, Hd + 12), 14, 14, fill(0xFF1A0A07));
-                  float px = Wd * 0.80f;
-                  cv.drawCircle(px, Hd - 56, 9f, fill(0xFF0A0403));
-                  cv.drawRoundRect(new RectF(px - 20, Hd - 46, px + 20, Hd + 6), 18, 18, fill(0xFF0A0403));
+                  card(Wd - 32, Hd * 0.60f, 62f);
                   header(12, 18, 15, 12, 0xFFFFFFFF, true);
-                  RectF tile = new RectF(12, 36, 54, 78);
-                  cv.drawRoundRect(tile, 11, 11, fill(0xFF2B1810));
-                  cv.drawRoundRect(tile, 11, 11, stroke(0x33FFFFFF, 1f));
-                  icon(iconFor(st.cat), 33, 57, 28, 0xFFFFB347, 0xFFFF6A00, 1.9f);
+                  RectF tl = new RectF(12, 36, 54, 78);
+                  cv.drawRoundRect(tl, 11, 11, fill(0x55000000));
+                  cv.drawRoundRect(tl, 11, 11, stroke(0x33FFFFFF, 1f));
+                  icon(iconFor(st.cat), 33, 57, 28, th[3], th[4], 1.9f);
                   Paint tt = tp(0xFFFFFFFF, 16, BOLD, LEFT);
-                  txt(fit(st.title, tt, Wd * 0.58f - 64 + 10), 64, 50, tt);
-                  clockRow(64, 70, 12, 11.5f, 0xFFFFE2CC);
-                  pill(12, Hd - 22, 26, st.pill, 13, 0xFFFFA11F, 0xFFFF6A00, 0xFFFFFFFF, 0, 0);
+                  txt(fit(st.title, tt, Wd - 64 - 44), 64, 50, tt);
+                  clockRow(64, 70, 12, 11.5f, 0xFFF2F2FF);
+                  pill(12, Hd - 22, 26, st.pill, 13, th[3], th[4], onAcc(), 0, 0);
               }
 
               void v3() {
-                  bg(0xFF081028, 0xFF0E1F5C, 0xFF1B2A8C);
-                  glow(Wd * 0.85f, Hd * 0.95f, Wd * 0.5f, 0x886B4BFF);
-                  float[] hs = {26, 40, 30, 52, 34, 44, 28};
-                  for (int i = 0; i < hs.length; i++) {
-                      float x = Wd * 0.46f + i * (Wd * 0.54f / hs.length);
-                      cv.drawRect(x, Hd - hs[i], x + Wd * 0.54f / hs.length - 2, Hd, fill(0xFF0A1236));
-                      cv.drawRect(x + 3, Hd - hs[i] + 6, x + 5, Hd - hs[i] + 8, fill(0xFF7FE3FF));
-                      cv.drawRect(x + 3, Hd - hs[i] + 14, x + 5, Hd - hs[i] + 16, fill(0xFFFFE08A));
-                  }
-                  float px = Wd - 30;
-                  cv.drawCircle(px, Hd - 52, 6f, fill(0xFF050A1E));
-                  cv.drawRoundRect(new RectF(px - 11, Hd - 44, px + 11, Hd + 6), 9, 9, fill(0xFF050A1E));
-                  cv.save();
-                  cv.rotate(-9f, Wd - 40, 30);
-                  String[] w = {"Good", "Vibes", "Only"};
-                  for (int i = 0; i < 3; i++) {
-                      txt(w[i], Wd - 40, 16 + i * 13, blur(tp(0xFF3DDCFF, 14, SCRIPT, CENTER), 4));
-                      txt(w[i], Wd - 40, 16 + i * 13, tp(0xFFE6FBFF, 14, SCRIPT, CENTER));
-                  }
-                  cv.restore();
+                  card(Wd - 32, Hd * 0.62f, 60f);
                   header(12, 18, 15, 12, 0xFFFFFFFF, false);
-                  ring(35, 58, 20, 4.5f, st.progress, 0xFF2F6BFF, 0xFF5EE0FF, 0x33FFFFFF, true);
+                  cv.save();
+                  cv.rotate(-8f, Wd - 44, 18);
+                  txt(st.motto, Wd - 44, 18, blur(tp(th[4], 15, SCRIPT, CENTER), 4));
+                  txt(st.motto, Wd - 44, 18, tp(mix(th[4], 0xFFFFFFFF, 0.85f), 15, SCRIPT, CENTER));
+                  cv.restore();
+                  ring(35, 58, 20, 4.5f, st.progress, th[3], th[4], 0x33FFFFFF, true);
                   int ik = iconFor(st.cat) == I_FILM ? I_PLAY : iconFor(st.cat);
                   icon(ik, 35, 58, 20, 0xFFFFFFFF, 0xFFFFFFFF, 1.8f);
                   Paint tt = tp(0xFFFFFFFF, 18, BOLD, LEFT);
-                  txt(fit(st.title, tt, Wd * 0.50f - 10), 66, 50, tt);
-                  clockRow(66, 70, 12, 11.5f, 0xFFD6E4FF);
-                  pill(12, Hd - 22, 26, st.pill, 13, 0xFF2F78FF, 0xFF1B5BFF, 0xFFFFFFFF, 0, 0);
+                  txt(fit(st.title, tt, Wd - 66 - 40), 66, 50, tt);
+                  clockRow(66, 70, 12, 11.5f, 0xFFEEF0FF);
+                  pill(12, Hd - 22, 26, st.pill, 13, th[3], th[4], onAcc(), 0, 0);
               }
 
               void v4() {
-                  bg(0xFF090E20, 0xFF0B1228, 0xFF0F1736);
-                  glow(Wd * 0.2f, Hd * 0.6f, Wd * 0.3f, 0x223D2BFF);
+                  bg(th[0], th[1], th[2]);
+                  glow(Wd * 0.2f, Hd * 0.6f, Wd * 0.3f, al(th[5], 0x44));
+                  scene(st.cat, Wd - 56, Hd * 0.5f, Hd * 0.95f);
+                  cv.drawRect(0, 0, Wd, Hd, fill(al(th[1], 0xC8)));
                   header(14, 15, 13, 11.5f, 0xB3FFFFFF, true);
                   float cy = Hd * 0.58f;
-                  ring(40, cy, 22, 4.5f, st.progress, 0xFFB06BFF, 0xFF3B8CFF, 0x443B2A8A, true);
-                  icon(iconFor(st.cat), 40, cy, 24, 0xFFE3D6FF, 0xFFA9C8FF, 1.8f);
+                  ring(40, cy, 22, 4.5f, st.progress, th[3], th[4], 0x33FFFFFF, true);
+                  icon(iconFor(st.cat), 40, cy, 24, mix(th[3], 0xFFFFFFFF, 0.7f), mix(th[4], 0xFFFFFFFF, 0.6f), 1.8f);
                   float tx = 78f;
                   float pw = pillW(st.pill, 12.5f, true);
                   Paint tt = tp(0xFFFFFFFF, 17, BOLD, LEFT);
                   txt(fit(st.title, tt, Wd - tx - pw - 28), tx, cy - 12, tt);
                   clockRow(tx, cy + 7, 12, 12.5f, 0xCCFFFFFF);
-                  pill(Wd - 14 - pw, cy - 8, 26, st.pill, 12.5f, 0x22B06BFF, 0x223B8CFF, 0xFFFFFFFF, I_STOP, 0xAA7B6CFF);
+                  pill(Wd - 14 - pw, cy - 8, 26, st.pill, 12.5f, al(th[3], 0x33), al(th[4], 0x33), 0xFFFFFFFF, I_STOP, al(th[3], 0xCC));
                   float by = Hd - 11;
                   RectF track = new RectF(tx, by - 2.5f, Wd - 14, by + 2.5f);
                   cv.drawRoundRect(track, 2.5f, 2.5f, fill(0x33FFFFFF));
                   if (st.progress > 0.01f) {
                       Paint fp = fill(0xFFFFFFFF);
-                      lg(fp, tx, 0, Wd - 14, 0, 0xFFB06BFF, 0xFF3B8CFF);
+                      lg(fp, tx, 0, Wd - 14, 0, th[3], th[4]);
                       cv.drawRoundRect(new RectF(tx, by - 2.5f, tx + track.width() * st.progress, by + 2.5f), 2.5f, 2.5f, fp);
                   }
               }
 
               void v5() {
-                  bg(0xFF10162E, 0xFF1B1B45, 0xFF2A2060);
-                  glow(Wd * 0.85f, Hd * 0.5f, Wd * 0.4f, 0x554F7CFF);
+                  bg(th[0], th[1], th[2]);
+                  glow(Wd * 0.85f, Hd * 0.5f, Wd * 0.4f, al(th[5], 0x88));
+                  scene(st.cat, Wd - 46, Hd * 0.5f, Hd * 1.05f);
+                  cv.drawRect(0, 0, Wd, Hd, fill(al(th[1], 0xC0)));
                   float cy = Hd / 2f;
-                  RectF tile = new RectF(12, cy - 26, 64, cy + 26);
-                  Paint tl = fill(0xFFFFFFFF);
-                  lg(tl, 12, cy + 26, 64, cy - 26, 0xFF4F7CFF, 0xFF9B5CFF);
-                  cv.drawRoundRect(tile, 14, 14, tl);
-                  icon(iconFor(st.cat), 38, cy, 28, 0xFFFFFFFF, 0xFFFFFFFF, 1.8f);
+                  tile(cy, 52);
                   float tx = 76f;
                   txt("Ma routine", tx, cy - 20, tp(0xBBFFFFFF, 11, REG, LEFT));
                   Paint tt = tp(0xFFFFFFFF, 17, BOLD, LEFT);
