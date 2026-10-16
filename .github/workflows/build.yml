@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+env:
+  SUPABASE_URL: "https://vklcgzwzxbwpjleepsdy.supabase.co"
+  SUPABASE_KEY: "sb_publishable_o-DQCrukTQW6H55usOIJyQ_Qy7R9l2z"
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -71,6 +74,7 @@ jobs:
               <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
               <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32"/>
               <uses-permission android:name="android.permission.INTERNET"/>
+              <uses-permission android:name="android.permission.VIBRATE"/>
               <application
                   android:label="Ma routine"
                   android:icon="@mipmap/ic_launcher"
@@ -1484,6 +1488,83 @@ jobs:
           .am.ok{color:#7ee0b0}
           .who{padding:8px 14px;font-size:13px;color:var(--ink);border-bottom:1px solid var(--ln);margin-bottom:4px;word-break:break-all}
           .who small{display:block;color:var(--mu);font-size:11px;margin-top:2px}
+          button:active{transform:scale(.97)}
+          .b,.menu button,.lk{transition:transform .15s,background .2s,box-shadow .2s}
+          .b.p{box-shadow:0 10px 26px -10px var(--c1)}
+          #fx{transition:transform .6s ease-out}
+          #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));z-index:90;transform:translate(-50%,30px);opacity:0;max-width:86vw;padding:12px 18px;border-radius:16px;background:rgba(20,25,60,.94);border:1px solid var(--ln);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-weight:600;font-size:14px;text-align:center;pointer-events:none;transition:opacity .3s,transform .4s cubic-bezier(.2,.9,.3,1.3)}
+          #toast.on{opacity:1;transform:translate(-50%,0)}
+          #cf{position:fixed;inset:0;z-index:95;pointer-events:none;width:100%;height:100%}
+          .stage.pls{animation:pls .8s ease}
+          @keyframes pls{30%{transform:scale(1.07)}60%{transform:scale(.98)}}
+          .ac{animation:pop .5s cubic-bezier(.2,.9,.3,1.2)}
+          .ac.sh{animation:shake .4s}
+          @keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+          #ali{animation:bob 2.6s ease-in-out infinite}
+          .pwr{position:relative}
+          .pwr input{padding-right:46px}
+          #eye{position:absolute;right:4px;top:2px;border:0;background:none;font-size:18px;padding:9px}
+          .pw{display:flex;align-items:center;gap:8px;margin:-2px 0 10px;font-size:12px;color:var(--mu)}
+          .pw b{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+          .pw i{display:block;height:100%;width:0;border-radius:3px;transition:width .3s,background .3s}
+          .pw span{min-width:62px;text-align:right}
+          #tour{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;background:radial-gradient(120% 70% at 50% 0,rgba(176,107,255,.2),transparent 60%),rgba(7,11,28,.97);padding:max(14px,env(safe-area-inset-top)) 20px max(16px,env(safe-area-inset-bottom))}
+          #tour.on{display:flex}
+          .th{display:flex;align-items:center;justify-content:space-between;min-height:40px}
+          #tdots{display:flex;gap:6px}
+          #tdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s}
+          #tdots i.on{width:24px;border-radius:5px;background:linear-gradient(90deg,var(--c1),var(--c2))}
+          #tskip{border:0;background:none;color:var(--mu);font-size:15px;padding:8px}
+          #tstage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+          .sl{width:100%;max-width:420px;text-align:center}
+          .sl.r{animation:inr .45s cubic-bezier(.2,.8,.2,1)}
+          .sl.l{animation:inl .45s cubic-bezier(.2,.8,.2,1)}
+          @keyframes inr{from{opacity:0;transform:translateX(50px)}}
+          @keyframes inl{from{opacity:0;transform:translateX(-50px)}}
+          .sv{min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+          .sl h2{font-size:26px;margin:14px 0 8px;line-height:1.15;background:linear-gradient(90deg,var(--c1),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}
+          .sl p{margin:0 auto;max-width:330px;color:#c3cdf5;font-size:15px}
+          .tf{display:flex;gap:10px}
+          .tf .b{flex:1}
+          .gr span{display:block;font-size:92px;animation:tada 1.8s ease-in-out infinite}
+          @keyframes tada{10%,20%{transform:scale(.9) rotate(-6deg)}30%,50%,70%{transform:scale(1.12) rotate(6deg)}40%,60%{transform:scale(1.12) rotate(-6deg)}80%,100%{transform:none}}
+          .mw{position:relative;width:170px;height:170px}
+          .mw svg{width:100%;height:100%}
+          .m0{fill:none;stroke:rgba(255,255,255,.1);stroke-width:10}
+          .m1{fill:none;stroke:url(#mg);stroke-width:10;stroke-linecap:round;stroke-dasharray:314;animation:mrd 5s ease-in-out infinite alternate}
+          @keyframes mrd{from{stroke-dashoffset:300}to{stroke-dashoffset:40}}
+          .mrt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;font-variant-numeric:tabular-nums}
+          .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+          .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--ln);background:var(--sf);font-size:13px;transition:all .3s}
+          .chip.on{background:linear-gradient(90deg,var(--c1),var(--c2));border-color:transparent;transform:scale(1.08)}
+          .tin{width:100%;border:1px solid var(--ln);background:rgba(255,255,255,.06);border-radius:14px;padding:12px 14px;font-size:16px;text-align:center}
+          .tpv{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--ln);border-radius:16px;background:var(--sf);width:100%;text-align:left;min-height:64px;animation:pop .4s ease}
+          .tpv .e{font-size:28px;width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--c1),var(--c2));flex:none}
+          .tpv small{color:var(--mu)}
+          .ph{width:260px;height:150px;border-radius:26px;border:2px solid var(--ln);background:rgba(255,255,255,.04);position:relative;overflow:hidden}
+          .ntf{position:absolute;left:10px;right:10px;top:-70px;padding:10px 12px;border-radius:16px;background:rgba(40,46,92,.96);text-align:left;font-size:13px;animation:ntf 4s ease-in-out infinite}
+          .ntf b{display:block;font-size:12px;color:var(--c2);margin-bottom:2px}
+          @keyframes ntf{0%,10%{top:-70px}25%,70%{top:14px}85%,100%{top:-70px}}
+          .wg{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+          .wc{border-radius:18px;padding:12px;text-align:left;font-size:13px;border:1px solid rgba(255,255,255,.14)}
+          .wc b{display:block;font-size:16px;margin-top:4px}
+          .wc small{color:rgba(255,255,255,.7)}
+          .w1{background:linear-gradient(135deg,#0b0f2e,#27177a)}
+          .w2{background:linear-gradient(135deg,#1b0b06,#a5420f)}
+          .w3{grid-column:1/3;background:linear-gradient(135deg,#0b1222,#101a33)}
+          .pb{height:5px;border-radius:3px;background:rgba(255,255,255,.15);margin-top:8px;overflow:hidden}
+          .pb i{display:block;height:100%;width:45%;background:linear-gradient(90deg,#a855f7,#3b82f6);animation:pbx 3s ease-in-out infinite alternate}
+          @keyframes pbx{from{width:20%}to{width:85%}}
+          .sy2{display:flex;align-items:center;gap:10px;font-size:40px}
+          .sy2 i{font-style:normal;font-size:22px;color:var(--c2);animation:pl2 1.2s infinite}
+          @keyframes pl2{50%{opacity:.25}}
+          .tg2{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+          .tc{border:1px solid var(--ln);background:var(--sf);border-radius:18px;padding:12px;text-align:left;transition:all .25s}
+          .tc.sel{border-color:var(--c1);box-shadow:0 0 0 2px var(--c1),0 12px 28px -10px var(--c1);transform:scale(1.03)}
+          .tc .e{font-size:26px;display:block}
+          .tc b{display:block;margin-top:2px}
+          .tc small{color:var(--mu);font-size:12px}
+          .ac #acd,.ac #rcd{text-align:center;letter-spacing:6px;font-size:20px}
           @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
           </style>
           </head>
@@ -1499,6 +1580,8 @@ jobs:
               <button id="m1"><b>🗓️</b>Routine</button>
              <button id="m2"><b>➕</b>Ajouter un bloc</button>
               <button id="m3" style="display:none"><b>🚪</b>Se déconnecter</button>
+              <button id="m5"><b>🧭</b>Guide</button>
+              <button id="m4" style="display:none"><b>☁️</b>Comptes en ligne</button>
             </div>
            </div>
            <div class="stage">
@@ -1544,21 +1627,50 @@ jobs:
            </main>
           </div>
 
-          <div id="auth" class="au"><div class="ac">
-           <div class="al">⏱️</div>
+          <div id="toast"></div>
+          <canvas id="cf"></canvas>
+
+          <div id="tour">
+           <div class="th"><div id="tdots"></div><button id="tskip">Passer</button></div>
+           <div id="tstage"></div>
+           <div class="tf"><button class="b" id="tback">Retour</button><button class="b p" id="tnext">Suivant</button></div>
+          </div>
+
+          <div id="cfg" class="au"><div class="ac">
+           <div class="al">☁️</div>
+           <h2>Activer les comptes en ligne</h2>
+           <p class="sub">Colle l'URL de ton projet Supabase et sa clé « anon / publishable » (Project Settings → API). Jamais la clé secrète.</p>
+           <input id="ck" placeholder="URL (https://xxxx.supabase.co)" autocapitalize="none" autocorrect="off" spellcheck="false">
+           <input id="cp" placeholder="Clé anon / publishable" autocapitalize="none" autocorrect="off" spellcheck="false">
+           <button class="b p" id="cok">Enregistrer</button>
+           <button class="lk" id="ccl">Plus tard</button>
+           <div class="am" id="cm"></div>
+          </div></div>
+
+          <div id="auth" class="au"><div class="ac" id="acard">
+           <div class="al" id="ali">⏱️</div>
            <h2 id="at">Connexion</h2>
            <p class="sub" id="as"></p>
            <div id="af">
             <input id="ae" type="email" placeholder="Email" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false">
-            <input id="ap" type="password" placeholder="Mot de passe (6 caractères minimum)" autocomplete="current-password">
+            <div class="pwr"><input id="ap" type="password" placeholder="Mot de passe (6 caractères minimum)" autocomplete="current-password"><button id="eye" type="button" aria-label="Afficher le mot de passe">👁</button></div>
+            <div class="pw" id="pw" style="display:none"><b><i id="pwb"></i></b><span id="pwt"></span></div>
             <button class="b p" id="ago">Se connecter</button>
             <button class="b" id="asw">Créer un compte</button>
             <button class="lk" id="afg">Mot de passe oublié ?</button>
            </div>
            <div id="av" style="display:none">
-            <button class="b p" id="ach">J'ai vérifié mon email</button>
+            <input id="acd" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code (si l'email en contient un)">
+            <button class="b p" id="acv">Valider le code</button>
+            <button class="b" id="ach">J'ai cliqué sur le lien</button>
             <button class="b" id="are">Renvoyer l'email</button>
             <button class="lk" id="alo">Changer de compte</button>
+           </div>
+           <div id="ar" style="display:none">
+            <input id="rcd" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code reçu par email">
+            <input id="rpw" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password">
+            <button class="b p" id="rgo">Changer le mot de passe</button>
+            <button class="lk" id="rcl">Retour</button>
            </div>
            <div class="am" id="am"></div>
           </div></div>
@@ -1574,7 +1686,8 @@ jobs:
            {k:"read",m:/lecture|livre|read/,e:"📖",a:"#ffd166",b:"#ef8354",t:"Une page après l'autre."},
            {k:"lang",m:/anglais|english|langue/,e:"🗣️",a:"#ff6bd6",b:"#6b8cff",t:"Chaque jour, un peu mieux."},
            {k:"wake",m:/réveil|reveil|lever/,e:"🌅",a:"#ffd36b",b:"#ff7a59",t:"Une belle journée t'attend."},
-           {k:"review",m:/bilan|ooda/,e:"🎯",a:"#a78bfa",b:"#6366f1",t:"Observer, s'orienter, décider, agir."}];
+           {k:"work",m:/travail|work|projet|focus|étude|etude|cours/,e:"💻",a:"#38bdf8",b:"#6366f1",t:"Un bloc à la fois, à fond."},
+             {k:"review",m:/bilan|ooda/,e:"🎯",a:"#a78bfa",b:"#6366f1",t:"Observer, s'orienter, décider, agir."}];
           const DEFC={k:"gen",e:"⏱️",a:"#60a5fa",b:"#818cf8",t:"Reste concentré sur l'essentiel."};
           const $=id=>document.getElementById(id);
           const pad=n=>String(n).padStart(2,"0");
@@ -1660,7 +1773,7 @@ jobs:
           function home(){
            const n=new Date(),c=n.getHours()*60+n.getMinutes()+n.getSeconds()/60;
            const h=n.getHours();
-           $("hi").textContent=h<5||h>=18?"Bonsoir":h<12?"Bonjour":"Bon après-midi";
+           $("hi").textContent=(h<5||h>=18?"Bonsoir":h<12?"Bonjour":"Bon après-midi")+(nm()?" "+nm():"");
            let ds="";try{ds=n.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}catch(e){}
            $("dt").textContent=ds?ds.charAt(0).toUpperCase()+ds.slice(1):"";
            $("clk").textContent=pad(n.getHours())+":"+pad(n.getMinutes());$("sec").textContent=":"+pad(n.getSeconds());
@@ -1673,7 +1786,7 @@ jobs:
            const live=k>=0;let sh=k,p=0;
            if(live){p=(c-mn(L[k].s))/Math.max(1,mn(L[k].e)-mn(L[k].s))}
            else{sh=L.findIndex(x=>mn(x.s)>c);if(sh<0&&L.length)sh=0}
-           const x=sh>=0?L[sh]:null;
+           const x=sh>=0?L[sh]:null;trackBlock(live&&x?x:null);
            if(!x){theme(DEFC);$("ct").textContent="Aucune activité";$("cr").textContent="";$("cl").style.display="none";$("tg").textContent="Ajoute tes blocs via le menu ⋮";$("nxc").style.display="none";$("st").textContent="LIBRE";return}
            const ct=cat(x.t);theme(ct);
            $("ct").textContent=x.t;$("cr").textContent=x.s+" – "+x.e;$("tg").textContent=ct.t;
@@ -1688,53 +1801,95 @@ jobs:
            $("nxc").style.display=y?"":"none";
            if(y){const cy=cat(y.t);$("ne").textContent=cy.e;$("nn").textContent=y.t;$("nw").textContent="à "+y.s+" · durée "+fmt(mn(y.e)-mn(y.s))}
           }
-          /* ---------- Compte + sauvegarde en ligne (Firebase, API REST) ---------- */
-          const FB_KEY="__FB_API_KEY__",FB_PROJ="__FB_PROJECT_ID__";
-          const CLOUD=/^AIza[\w-]{30,}$/.test(FB_KEY)&&/^[a-z0-9][a-z0-9-]{3,}$/.test(FB_PROJ);
-          const SES="routine-session",OWN="routine-owner",TS="routine-ts";
-          const IDT="https://identitytoolkit.googleapis.com/v1/accounts:";
-          const AUTH_BAD=/TOKEN_EXPIRED|USER_NOT_FOUND|USER_DISABLED|INVALID_REFRESH_TOKEN|CREDENTIAL_TOO_OLD|INVALID_GRANT/;
-          const ERR={EMAIL_EXISTS:"Cet email a déjà un compte.",EMAIL_NOT_FOUND:"Email ou mot de passe incorrect.",INVALID_PASSWORD:"Email ou mot de passe incorrect.",INVALID_LOGIN_CREDENTIALS:"Email ou mot de passe incorrect.",INVALID_EMAIL:"Email invalide.",MISSING_PASSWORD:"Entre ton mot de passe.",USER_DISABLED:"Ce compte est désactivé.",TOO_MANY_ATTEMPTS_TRY_LATER:"Trop d'essais. Réessaie dans quelques minutes.",OPERATION_NOT_ALLOWED:"Connexion par email désactivée dans Firebase."};
-          let ses=null,idTok="",idExp=0,pushT=0,busy=false,mode="login",lastPull=0;
+          /* ---------- Réactivité : toasts, confettis, vibrations ---------- */
+          function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+          function vib(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
+          let toastT=0;
+          function toast(t,ms){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove("on"),ms||2600)}
+          const CF=[];let cfRun=false;
+          function burst(n,x,y){
+           const c=$("cf"),w=c.width=innerWidth,h=c.height=innerHeight;
+           const cols=["#b06bff","#3b8cff","#34e0a1","#ffb347","#ff5a1f","#ff6bd6"];
+           for(let i=0;i<(n||90);i++){const a=Math.random()*Math.PI*2,v=4+Math.random()*9;CF.push({x:x==null?w/2:x,y:y==null?h*.35:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-5,s:4+Math.random()*6,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[i%cols.length],l:70+Math.random()*50})}
+           if(!cfRun){cfRun=true;requestAnimationFrame(cfLoop)}}
+          function cfLoop(){
+           const c=$("cf"),g=c.getContext("2d");g.clearRect(0,0,c.width,c.height);
+           for(let i=CF.length-1;i>=0;i--){const p=CF[i];p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.l--;
+            if(p.l<=0||p.y>c.height+20){CF.splice(i,1);continue}
+            g.save();g.translate(p.x,p.y);g.rotate(p.r);g.globalAlpha=Math.min(1,p.l/30);g.fillStyle=p.c;g.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);g.restore()}
+           if(CF.length)requestAnimationFrame(cfLoop);else{cfRun=false;g.clearRect(0,0,c.width,c.height)}}
+          let lastBlk=null;
+          function pulse(){const s=document.querySelector(".stage");if(!s)return;s.classList.remove("pls");void s.offsetWidth;s.classList.add("pls")}
+          function trackBlock(x){
+           const k=x?x.s+"|"+x.t:"";
+           if(lastBlk===null){lastBlk=k;return}
+           if(k===lastBlk)return;
+           const prev=lastBlk;lastBlk=k;
+           if(k){toast("▶ C'est parti : "+x.t);vib([40,60,40]);pulse()}
+           else if(prev){toast("✓ Bloc terminé");vib(30)}}
+          document.addEventListener("pointermove",e=>{$("fx").style.transform="translate("+((e.clientX/innerWidth-.5)*24)+"px,"+((e.clientY/innerHeight-.5)*24)+"px)"});
+          $("ic").onclick=e=>{const r=e.target.getBoundingClientRect();burst(40,r.left+r.width/2,r.top+r.height/2);vib(25)};
+
+          /* ---------- Compte + sauvegarde en ligne (Supabase, API REST) ---------- */
+          function sbKeyOk(k){
+           if(/^sb_publishable_[\w-]{10,}$/.test(k))return true;
+           const m=/^eyJ[\w-]+\.([\w-]+)\.[\w-]+$/.exec(k);if(!m)return false;
+           try{return JSON.parse(atob(m[1].replace(/-/g,"+").replace(/_/g,"/"))).role==="anon"}catch(e){return false}}
+          const SB_URL=/^https:\/\/[a-z0-9]+\.supabase\.co$/.test("__SB_URL__")?"__SB_URL__":(rd("routine-sbu")||"");
+          const SB_KEY=sbKeyOk("__SB_KEY__")?"__SB_KEY__":(rd("routine-sbk")||"");
+          const CLOUD=/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL)&&sbKeyOk(SB_KEY);
+          const SES="routine-session",PEND="routine-pend",OWN="routine-owner",TS="routine-ts",ONB="routine-onb",CFGSEEN="routine-cfgseen";
+          const HAD_LOCAL=rd(KEY)!==null;
+          const AUTH_BAD=/refresh_token|session_not_found|session_expired|invalid_grant|user_not_found|user_banned|bad_jwt|invalid refresh token/i;
+          const ERR={invalid_credentials:"Email ou mot de passe incorrect.",user_already_exists:"Cet email a déjà un compte.",email_exists:"Cet email a déjà un compte.",weak_password:"Mot de passe trop faible (6 caractères minimum).",email_address_invalid:"Email invalide.",validation_failed:"Email ou mot de passe invalide.",over_email_send_rate_limit:"Trop d'envois. Réessaie dans une minute.",over_request_rate_limit:"Trop d'essais. Réessaie dans quelques minutes.",otp_expired:"Code invalide ou expiré.",signup_disabled:"Les inscriptions sont désactivées.",email_provider_disabled:"Connexion par email désactivée dans Supabase.",user_banned:"Ce compte est désactivé.",same_password:"Choisis un autre mot de passe.",email_not_confirmed:"Email pas encore vérifié."};
+          let ses=null,idTok="",idExp=0,pushT=0,busy=false,mode="login",lastPull=0,pollT=0,onb=false,hadCloud=false,pendEmail="",pendPw="",refP=null,linkReset=false;
           function rd(k){try{return localStorage.getItem(k)}catch(e){return null}}
           function wr(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}}
-          function errMsg(m){m=String(m||"");if(m.indexOf("WEAK_PASSWORD")===0)return"Mot de passe trop faible (6 caractères minimum).";const k=Object.keys(ERR).find(x=>m.indexOf(x)===0);return k?ERR[k]:"Erreur réseau ou serveur. Vérifie ta connexion."}
-          async function api(url,body){
-           const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","X-Firebase-Locale":"fr"},body:JSON.stringify(body)});
-           const j=await r.json().catch(()=>({}));
-           if(!r.ok)throw new Error((j.error&&j.error.message)||("HTTP"+r.status));
+          function nm(){if(!ses||!ses.email)return"";const n=String(ses.email).split("@")[0].replace(/[._\d-]+/g," ").trim().split(" ")[0]||"";return n?n.charAt(0).toUpperCase()+n.slice(1):""}
+          function errMsg(e){
+           if(!e||e.code===undefined)return"Erreur réseau. Vérifie ta connexion.";
+           const m=String(e.message||"");
+           if(ERR[e.code])return ERR[e.code];
+           if(/password should|weak/i.test(m))return"Mot de passe trop faible (6 caractères minimum).";
+           if(/security purposes|rate limit/i.test(m)||e.status===429)return"Trop d'essais. Réessaie dans une minute.";
+           if(/expired|invalid/i.test(m)&&/token|otp|code/i.test(m))return"Code invalide ou expiré.";
+           return"Erreur : "+m}
+          function syncErr(e){
+           if(e&&(e.status===404||e.code==="PGRST205"))return"⚠ Table « routines » introuvable (SQL à lancer)";
+           if(e&&(e.status===401||e.status===403))return"⚠ Accès refusé (policies RLS)";
+           return"⚠ Hors ligne : données locales"}
+          async function api(path,body,tok,method,extra){
+           const h={"apikey":SB_KEY,"Content-Type":"application/json"};
+           if(tok)h.Authorization="Bearer "+tok;
+           if(extra)for(const k in extra)h[k]=extra[k];
+           const r=await fetch(SB_URL+path,{method:method||"POST",headers:h,body:body==null?undefined:JSON.stringify(body)});
+           const t=await r.text();let j={};try{j=t?JSON.parse(t):{}}catch(e){}
+           if(!r.ok){const e=new Error(j.msg||j.message||j.error_description||j.error||("HTTP"+r.status));e.code=String(j.error_code||j.code||j.error||"");e.status=r.status;throw e}
            return j}
           function setSes(j){
-           const o=ses||{};
-           ses={uid:j.localId||j.user_id||o.uid,email:j.email||o.email,rt:j.refreshToken||j.refresh_token||o.rt,ver:!!o.ver&&(!j.localId||j.localId===o.uid)};
-           idTok=j.idToken||j.id_token||"";idExp=Date.now()+((+j.expiresIn||+j.expires_in||3600)-60)*1000;
+           const o=ses||{},u=j.user||{};
+           ses={uid:u.id||o.uid,email:u.email||o.email,rt:j.refresh_token||o.rt,ver:!!o.ver&&(!u.id||u.id===o.uid)};
+           idTok=j.access_token||"";idExp=Date.now()+((+j.expires_in||3600)-60)*1000;
            wr(SES,JSON.stringify(ses))}
           async function token(force){
            if(!ses)throw new Error("NOAUTH");
            if(!force&&idTok&&Date.now()<idExp)return idTok;
-           const r=await fetch("https://securetoken.googleapis.com/v1/token?key="+FB_KEY,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"grant_type=refresh_token&refresh_token="+encodeURIComponent(ses.rt)});
-           const j=await r.json().catch(()=>({}));
-           if(!r.ok)throw new Error((j.error&&j.error.message)||("HTTP"+r.status));
-           setSes(j);return idTok}
+           if(!refP)refP=(async()=>{try{const j=await api("/auth/v1/token?grant_type=refresh_token",{refresh_token:ses.rt});setSes(j);return idTok}finally{refP=null}})();
+           return refP}
           async function isVerified(){
-           const t=await token(true);
-           const j=await api(IDT+"lookup?key="+FB_KEY,{idToken:t});
-           const u=j.users&&j.users[0];return !!(u&&u.emailVerified)}
-          function docUrl(){return"https://firestore.googleapis.com/v1/projects/"+FB_PROJ+"/databases/(default)/documents/users/"+ses.uid}
+           const t=await token();
+           const u=await api("/auth/v1/user",null,t,"GET");
+           return !!(u&&(u.email_confirmed_at||u.confirmed_at))}
           async function cloudGet(){
            const t=await token();
-           const r=await fetch(docUrl(),{headers:{Authorization:"Bearer "+t}});
-           if(r.status===404)return null;
-           if(!r.ok)throw new Error("HTTP"+r.status);
-           const f=(await r.json()).fields||{};
-           return{routine:(f.routine&&f.routine.stringValue)||"",ts:+((f.ts&&f.ts.integerValue)||0)}}
+           const j=await api("/rest/v1/routines?user_id=eq."+ses.uid+"&select=routine,ts,onb",null,t,"GET");
+           const r=Array.isArray(j)?j[0]:null;if(!r)return null;
+           return{routine:Array.isArray(r.routine)&&r.routine.length?r.routine:null,ts:+r.ts||0,onb:!!r.onb}}
           async function cloudPut(){
            const t=await token();
-           const ts=+rd(TS)||Date.now();
-           const r=await fetch(docUrl(),{method:"PATCH",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({fields:{routine:{stringValue:JSON.stringify(data)},ts:{integerValue:String(ts)}}})});
-           if(!r.ok)throw new Error("HTTP"+r.status)}
+           await api("/rest/v1/routines?on_conflict=user_id",{user_id:ses.uid,routine:data,ts:+rd(TS)||Date.now(),onb:!!onb},t,"POST",{Prefer:"resolution=merge-duplicates,return=minimal"})}
           function setSync(t){$("sy").textContent=t||""}
-          function updWho(){$("who").style.display=ses?"":"none";$("m3").style.display=ses?"":"none";$("wm").textContent=ses?ses.email:""}
+          function updWho(){$("who").style.display=ses?"":"none";$("m3").style.display=ses?"":"none";$("m4").style.display=CLOUD?"none":"";$("wm").textContent=ses?ses.email:""}
           function queuePush(){
            if(!CLOUD||!ses||!ses.ver)return;
            clearTimeout(pushT);
@@ -1742,18 +1897,28 @@ jobs:
           async function pull(){
            lastPull=Date.now();
            let c=null;
-           try{c=await cloudGet()}catch(e){setSync(/403/.test(String(e.message))?"⚠ Accès refusé (règles Firestore)":"⚠ Hors ligne : données locales");return}
+           try{c=await cloudGet()}catch(e){setSync(syncErr(e));return}
            const lts=+rd(TS)||0,own=rd(OWN);
+           hadCloud=!!(c&&c.routine);
+           if(c&&c.onb)onb=true;
            try{
             if(c&&c.routine){
              if(own===ses.uid&&lts>c.ts)await cloudPut();
-             else{const d=JSON.parse(c.routine);if(Array.isArray(d)){data=d;wr(TS,String(c.ts));persist();render()}}
+             else{data=c.routine;wr(TS,String(c.ts));lastBlk=null;persist();render()}
             }else{
              if(own!==ses.uid){data=fresh();wr(TS,String(Date.now()))}
-             persist();render();await cloudPut()}
+             lastBlk=null;persist();render();await cloudPut()}
             wr(OWN,ses.uid);setSync("✓ Synchronisé")
-           }catch(e){setSync("⚠ Synchronisation impossible")}}
-          function msg(t,ok){const m=$("am");m.textContent=t||"";m.className="am"+(ok?" ok":"")}
+           }catch(e){setSync(syncErr(e))}}
+          function msg(t,ok){
+           const m=$("am");m.textContent=t||"";m.className="am"+(ok?" ok":"");
+           if(t&&!ok){const c=$("acard");c.classList.remove("sh");void c.offsetWidth;c.classList.add("sh");vib(60)}}
+          function strength(p){let s=0;if(p.length>=6)s++;if(p.length>=10)s++;if(/[A-Z]/.test(p)&&/[a-z]/.test(p))s++;if(/\d/.test(p)&&(/[^A-Za-z0-9]/.test(p)||p.length>=8))s++;return Math.min(4,s)}
+          function showStr(){
+           const p=$("ap").value,s=strength(p);
+           $("pw").style.display=(mode==="signup"&&p.length>0)?"flex":"none";
+           $("pwb").style.width=(s*25)+"%";$("pwb").style.background=["#ff6b6b","#ff6b6b","#ffb347","#7ee0b0","#34e0a1"][s];
+           $("pwt").textContent=["Trop court","Faible","Moyen","Bon","Fort"][s]}
           function setMode(m){
            mode=m;const s=m==="signup";
            $("at").textContent=s?"Créer un compte":"Connexion";
@@ -1761,15 +1926,28 @@ jobs:
            $("ago").textContent=s?"S'inscrire":"Se connecter";
            $("asw").textContent=s?"J'ai déjà un compte":"Créer un compte";
            $("afg").style.display=s?"none":"";
-           $("ap").setAttribute("autocomplete",s?"new-password":"current-password")}
+           $("ap").setAttribute("autocomplete",s?"new-password":"current-password");
+           showStr()}
+          function poll(on){clearInterval(pollT);pollT=0;if(on)pollT=setInterval(()=>{if(!document.hidden&&pendPw)checkVer(true)},15000)}
           function showAuth(v){
            $("auth").classList.toggle("on",!!v);
            $("af").style.display=v==="login"?"":"none";
            $("av").style.display=v==="verify"?"":"none";
+           $("ar").style.display=v==="reset"?"":"none";
+           $("ali").textContent=v==="verify"?"📨":v==="reset"?"🔑":"⏱️";
+           poll(v==="verify");
            if(v==="login")setMode(mode);
-           if(v==="verify"){$("at").textContent="Vérifie ton email";$("as").textContent="Un email de confirmation a été envoyé à "+(ses?ses.email:"")+". Clique sur le lien dans l'email, puis reviens ici."}
+           if(v==="verify"){$("at").textContent="Vérifie ton email";$("as").textContent="Un email a été envoyé à "+pendEmail+". Clique sur le lien qu'il contient, puis reviens ici : l'écran se débloque tout seul. Si l'email contient un code, entre-le ci-dessous."}
+           if(v==="reset"){$("at").textContent="Nouveau mot de passe";$("rcd").style.display=linkReset?"none":"";$("as").textContent=linkReset?"Choisis ton nouveau mot de passe.":"Entre le code reçu à "+pendEmail+" (ou ouvre le lien de l'email depuis la version web) et choisis un nouveau mot de passe."}
            msg("")}
-          async function enter(){ses.ver=true;wr(SES,JSON.stringify(ses));showAuth("");updWho();await pull()}
+          async function enter(first){
+           ses.ver=true;wr(SES,JSON.stringify(ses));wr(PEND,null);pendPw="";linkReset=false;
+           onb=rd(ONB)===ses.uid;
+           showAuth("");updWho();
+           if(first){burst(120);vib([60,40,60]);toast("✅ Email vérifié, bienvenue "+nm()+" !",3200)}
+           await pull();
+           if(!onb)setTimeout(()=>startTour(hadCloud),700)}
+          function goVerify(em,pw){pendEmail=em;pendPw=pw||"";wr(PEND,em);ses=null;wr(SES,null);showAuth("verify")}
           async function submit(){
            if(busy)return;
            const em=$("ae").value.trim(),pw=$("ap").value;
@@ -1777,57 +1955,184 @@ jobs:
            busy=true;msg("Un instant…",true);
            try{
             if(mode==="signup"){
-             const j=await api(IDT+"signUp?key="+FB_KEY,{email:em,password:pw,returnSecureToken:true});
-             ses=null;setSes(j);
-             showAuth("verify");
-             try{await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"VERIFY_EMAIL",idToken:idTok});msg("Email envoyé. Pense à regarder tes spams.",true)}
-             catch(e2){msg("Compte créé, mais l'email n'a pas pu être envoyé. Touche « Renvoyer l'email ».")}
+             const j=await api("/auth/v1/signup",{email:em,password:pw});
+             if(j.access_token){msg("La confirmation par email est désactivée dans Supabase (Authentication → Sign In / Providers → Email → Confirm email).");busy=false;return}
+             if(j.identities&&j.identities.length===0){const e=new Error("exists");e.code="user_already_exists";throw e}
+             goVerify(em,pw);msg("Email envoyé. Pense à regarder tes spams.",true)
             }else{
-             const j=await api(IDT+"signInWithPassword?key="+FB_KEY,{email:em,password:pw,returnSecureToken:true});
-             ses=null;setSes(j);
-             if(await isVerified())await enter();
-             else{showAuth("verify");msg("Ton email n'est pas encore vérifié. Touche « Renvoyer l'email » si besoin.")}
+             try{
+              const j=await api("/auth/v1/token?grant_type=password",{email:em,password:pw});
+              ses=null;setSes(j);
+              if(await isVerified())await enter(false);
+              else{goVerify(em,pw);msg("Ton email n'est pas encore vérifié.")}
+             }catch(e){
+              if(e&&e.code==="email_not_confirmed"){goVerify(em,pw);msg("Ton email n'est pas encore vérifié. Clique sur le lien reçu, ou renvoie l'email.")}
+              else throw e}
             }
-           }catch(e){msg(errMsg(e.message))}
+           }catch(e){msg(errMsg(e))}
            busy=false}
-          async function checkVer(){
-           if(busy)return;busy=true;msg("Vérification…",true);
-           try{if(await isVerified())await enter();else msg("Pas encore vérifié. Ouvre le lien reçu par email, puis réessaie.")}
-           catch(e){msg(errMsg(e.message))}
+          async function verifyCode(){
+           if(busy)return;
+           const code=$("acd").value.replace(/\s/g,"");
+           if(!/^\d{4,10}$/.test(code)){msg("Entre le code reçu par email (chiffres).");return}
+           busy=true;msg("Vérification…",true);
+           try{const j=await api("/auth/v1/verify",{type:"signup",email:pendEmail,token:code});ses=null;setSes(j);await enter(true)}
+           catch(e){msg(errMsg(e))}
+           busy=false}
+          async function checkVer(q){
+           if(busy)return;
+           if(!pendPw){if(!q){showAuth("login");$("ae").value=pendEmail;msg("Si tu as cliqué sur le lien, connecte-toi avec ton mot de passe.",true)}return}
+           busy=true;if(!q)msg("Vérification…",true);
+           try{const j=await api("/auth/v1/token?grant_type=password",{email:pendEmail,password:pendPw});ses=null;setSes(j);await enter(true)}
+           catch(e){if(!q)msg(e&&e.code==="email_not_confirmed"?"Pas encore vérifié. Clique sur le lien de l'email ou entre le code.":errMsg(e))}
            busy=false}
           async function resend(){
            if(busy)return;busy=true;
-           try{const t=await token();await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"VERIFY_EMAIL",idToken:t});msg("Email renvoyé à "+ses.email+".",true)}
-           catch(e){msg(errMsg(e.message))}
+           try{await api("/auth/v1/resend",{type:"signup",email:pendEmail});msg("Email renvoyé à "+pendEmail+".",true)}
+           catch(e){msg(errMsg(e))}
            busy=false}
           async function forgot(){
            const em=$("ae").value.trim();
            if(!em){msg("Entre d'abord ton email ci-dessus.");return}
-           try{await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"PASSWORD_RESET",email:em});msg("Si ce compte existe, un email de réinitialisation a été envoyé.",true)}
-           catch(e){if(String(e.message).indexOf("EMAIL_NOT_FOUND")===0)msg("Si ce compte existe, un email de réinitialisation a été envoyé.",true);else msg(errMsg(e.message))}}
+           try{await api("/auth/v1/recover",{email:em});pendEmail=em;linkReset=false;showAuth("reset");msg("Si ce compte existe, un email a été envoyé.",true)}
+           catch(e){msg(errMsg(e))}}
+          async function doReset(){
+           if(busy)return;
+           const code=$("rcd").value.replace(/\s/g,""),pw=$("rpw").value;
+           if(!linkReset&&!/^\d{4,10}$/.test(code)){msg("Entre le code reçu par email.");return}
+           if(pw.length<6){msg("Mot de passe trop court (6 caractères minimum).");return}
+           busy=true;msg("Un instant…",true);
+           try{
+            if(!linkReset){const j=await api("/auth/v1/verify",{type:"recovery",email:pendEmail,token:code});ses=null;setSes(j)}
+            await api("/auth/v1/user",{password:pw},idTok,"PUT");
+            $("rpw").value="";$("rcd").value="";
+            await enter(false);toast("🔑 Mot de passe changé")
+           }catch(e){msg(errMsg(e))}
+           busy=false}
+          async function fromLink(){
+           const h=location.hash||"";if(h.indexOf("access_token=")<0)return false;
+           const p=new URLSearchParams(h.replace(/^#/,""));
+           try{history.replaceState(null,"",location.pathname)}catch(e){}
+           const at=p.get("access_token"),rt=p.get("refresh_token");if(!at||!rt)return false;
+           try{
+            const u=await api("/auth/v1/user",null,at,"GET");
+            ses=null;setSes({access_token:at,refresh_token:rt,expires_in:+p.get("expires_in")||3600,user:u});
+            if(p.get("type")==="recovery"){linkReset=true;pendEmail=u.email||"";showAuth("reset");return true}
+            await enter(true);return true
+           }catch(e){return false}}
           async function logout(){
            try{if(ses&&ses.ver&&pushT){clearTimeout(pushT);pushT=0;await cloudPut()}}catch(e){}
-           ses=null;idTok="";wr(SES,null);wr(OWN,null);wr(TS,null);wr(KEY,null);
-           data=[];persist();render();updWho();setSync("");closeMenu();$("ap").value="";showAuth("login")}
+           try{if(idTok)await api("/auth/v1/logout?scope=local",null,idTok)}catch(e){}
+           ses=null;idTok="";pendPw="";pendEmail="";linkReset=false;wr(SES,null);wr(PEND,null);wr(OWN,null);wr(TS,null);wr(KEY,null);
+           $("tour").classList.remove("on");clearInterval(tTimer);
+           data=[];lastBlk=null;persist();render();updWho();setSync("");closeMenu();$("ap").value="";showAuth("login")}
           async function authInit(){
-           if(!CLOUD)return;
+           updWho();
+           if(!CLOUD){if(rd(ONB)!=="local")setTimeout(()=>startTour(HAD_LOCAL),600);return}
+           if(await fromLink())return;
            let s=null;try{s=JSON.parse(rd(SES))}catch(e){}
-           if(s&&s.uid&&s.rt)ses=s;
-           if(!ses||!ses.ver){data=[];persist();render();showAuth(ses?"verify":"login");return}
+           if(s&&s.uid&&s.rt&&s.ver)ses=s;
+           pendEmail=rd(PEND)||"";
+           if(!ses){data=[];lastBlk=null;persist();render();showAuth(pendEmail?"verify":"login");return}
            updWho();
            try{
-            if(await isVerified())await pull();
-            else{ses.ver=false;wr(SES,JSON.stringify(ses));data=[];persist();render();showAuth("verify")}
-           }catch(e){if(AUTH_BAD.test(String(e.message)))logout();else setSync("⚠ Hors ligne : données locales")}}
+            if(await isVerified()){onb=rd(ONB)===ses.uid;await pull();if(!onb)startTour(hadCloud)}
+            else{ses=null;wr(SES,null);data=[];lastBlk=null;persist();render();showAuth("login")}
+           }catch(e){if(AUTH_BAD.test(String(e&&e.code)+" "+String(e&&e.message)))logout();else setSync("⚠ Hors ligne : données locales")}}
+
+          /* ---------- Guide de bienvenue ---------- */
+          const TPL=[
+           {k:"eq",e:"⚖️",n:"Équilibrée",d:"Travail, pauses, loisirs",b:[["07:00","07:30","Réveil"],["07:30","08:00","Pause petit-déjeuner"],["08:00","09:00","Lecture"],["09:00","10:00","Anglais"],["10:00","10:15","Pause"],["10:15","12:30","Travail"],["12:30","13:30","Pause déjeuner"],["13:30","17:00","Travail"],["17:00","18:00","Jeu vidéo"],["19:00","20:00","Pause dîner"],["20:00","21:30","Série ou film"],["21:30","22:00","Bilan OODA"]]},
+           {k:"pro",e:"🚀",n:"Productive",d:"Matin tôt, gros focus",b:[["06:00","06:30","Réveil"],["06:30","07:15","Anglais"],["07:15","07:45","Pause petit-déjeuner"],["07:45","08:45","Lecture"],["09:00","12:00","Travail"],["12:00","13:00","Pause déjeuner"],["13:00","17:00","Travail"],["17:00","17:30","Pause"],["17:30","18:30","Lecture"],["20:00","20:30","Bilan OODA"]]},
+           {k:"trd",e:"📈",n:"Trader",d:"Session de trading le matin",b:[["06:30","07:00","Réveil"],["07:00","07:45","Anglais"],["07:45","09:00","Pause petit-déjeuner"],["09:00","12:00","Trading"],["12:00","13:00","Pause déjeuner"],["13:00","14:30","Lecture"],["14:30","15:30","Jeu vidéo"],["18:00","18:30","Bilan OODA"]]},
+           {k:"vide",e:"✨",n:"Page blanche",d:"Je construis tout moi-même",b:[]}];
+          let ti=0,tsel="eq",trp=false,tTimer=0,tx0=null;
+          function prevT(t){const c=cat(t),r=document.documentElement.style;r.setProperty("--c1",c.a);r.setProperty("--c2",c.b);$("tpv").innerHTML='<div class="e">'+c.e+'</div><div><b>'+esc(t||"Activité")+'</b><br><small>'+esc(c.t)+'</small></div>'}
+          function tplHtml(){
+           const L=(trp?[{k:"keep",e:"📌",n:"Ma routine",d:"Ne rien changer"}]:[]).concat(TPL);
+           return '<div class="tg2">'+L.map(t=>'<button class="tc'+(t.k===tsel?" sel":"")+'" data-k="'+t.k+'"><span class="e">'+t.e+'</span><b>'+t.n+'</b><small>'+t.d+'</small></button>').join("")+'</div>'}
+          const SLIDES=[
+           ()=>({t:"Bienvenue"+(nm()?" "+esc(nm()):"")+" 👋",d:(CLOUD&&ses?"Ton compte est prêt. ":"")+"Un tour express de 30 secondes, avec un aperçu de chaque fonction.",h:'<div class="gr"><span>🎉</span></div>'}),
+           ()=>({t:"Ta journée en direct",d:"L'anneau se remplit au fil de l'activité en cours, avec le temps restant en grand.",h:'<div class="mw"><svg viewBox="0 0 120 120"><defs><linearGradient id="mg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" style="stop-color:var(--c1)"/><stop offset="1" style="stop-color:var(--c2)"/></linearGradient></defs><circle class="m0" cx="60" cy="60" r="50"/><circle class="m1" cx="60" cy="60" r="50" transform="rotate(-90 60 60)"/></svg><div class="mrt" id="mrt">37 min</div></div>',
+            i:function(){let n=0;tTimer=setInterval(()=>{n=(n+1)%30;$("mrt").textContent=(37-n)+" min"},500)}}),
+           ()=>({t:"Chaque activité a son style",d:"Spoil : le titre change tout. Écris « Trading », « Film » ou « Lecture » et l'app change de couleur et d'ambiance. Essaie !",h:'<div class="chips" id="chips"></div><input id="tin" class="tin" placeholder="Tape un titre : Trading, Film…" autocomplete="off"><div class="tpv" id="tpv"></div>',
+            i:function(){
+             const ex=["Jeu vidéo","Série ou film","Trading","Lecture","Pause","Anglais","Réveil","Bilan OODA"],ch=$("chips");
+             const mark=j=>{for(let q=0;q<ch.children.length;q++)ch.children[q].classList.toggle("on",q===j)};
+             ex.forEach((t,j)=>{const b=mk("button","chip");b.textContent=cat(t).e+" "+t;b.onclick=()=>{clearInterval(tTimer);mark(j);prevT(t)};ch.append(b)});
+             let j=0;mark(0);prevT(ex[0]);
+             tTimer=setInterval(()=>{j=(j+1)%ex.length;mark(j);prevT(ex[j])},1700);
+             $("tin").oninput=()=>{clearInterval(tTimer);mark(-1);prevT($("tin").value)}}}),
+           ()=>({t:"Des rappels au bon moment",d:"Une notification au début de chaque bloc. Tu peux la couper bloc par bloc.",h:'<div class="ph"><div class="ntf"><b>⏱️ Ma routine</b>📈 Trading · 10:00 – 12:00</div></div>'}),
+           ()=>({t:"Des widgets sur ton écran",d:"Spoil : 6 styles de widgets (bannière, gaming, cinéma, série, minimaliste, compact). Appui long sur l'écran d'accueil, puis Widgets, puis Ma routine.",h:'<div class="wg"><div class="wc w1">🎮<b>Jeu vidéo</b><small>13:00 – 14:30</small><div class="pb"><i></i></div></div><div class="wc w2">🎬<b>Film / Série</b><small>37 min restantes</small></div><div class="wc w3">⏱️ <b style="display:inline">Minimaliste</b> <small>clair et élégant</small></div></div>'}),
+           ()=>({t:CLOUD?"Partout avec toi":"Tout reste sur ton téléphone",d:CLOUD?"Ta routine est sauvegardée en ligne : connecte-toi sur un autre appareil et tout est là.":"Ta routine est enregistrée sur cet appareil et marche sans internet.",h:CLOUD?'<div class="sy2">📱<i>●●●</i>☁️<i>●●●</i>💻</div>':'<div class="sy2">📱<i>●</i>✅</div>'}),
+           ()=>({t:"Choisis ton point de départ",d:"Tu pourras tout modifier ensuite, bloc par bloc.",h:tplHtml()})];
+          function drawSlide(dir){
+           clearInterval(tTimer);tTimer=0;
+           const s=SLIDES[ti]();
+           $("tstage").innerHTML='<div class="sl '+(dir<0?"l":"r")+'"><div class="sv">'+s.h+'</div><h2>'+s.t+'</h2><p>'+s.d+'</p></div>';
+           const dots=$("tdots");dots.innerHTML="";
+           for(let q=0;q<SLIDES.length;q++){const d=mk("i");if(q===ti)d.className="on";dots.append(d)}
+           const last=ti===SLIDES.length-1;
+           $("tback").style.visibility=ti?"visible":"hidden";
+           $("tnext").textContent=last?"Terminer ✔":"Suivant";
+           $("tskip").style.visibility=last?"hidden":"visible";
+           if(ti!==2){const r=document.documentElement.style;if(curK){const c=CATS.concat([DEFC]).find(x=>x.k===curK)||DEFC;r.setProperty("--c1",c.a);r.setProperty("--c2",c.b)}}
+           if(s.i)s.i()}
+          function startTour(replay){
+           trp=!!replay;ti=0;tsel=trp?"keep":"eq";
+           $("tour").classList.add("on");drawSlide(1)}
+          function tNext(){if(ti>=SLIDES.length-1){endTour(true);return}ti++;drawSlide(1);vib(15)}
+          function tBack(){if(ti>0){ti--;drawSlide(-1)}}
+          function endTour(apply){
+           clearInterval(tTimer);tTimer=0;$("tour").classList.remove("on");
+           const t=apply&&tsel!=="keep"?TPL.find(x=>x.k===tsel):null;
+           if(t){data=t.b.map(a=>({s:a[0],e:a[1],t:a[2],n:true}));lastBlk=null;save();render()}
+           onb=true;wr(ONB,ses?ses.uid:"local");
+           if(CLOUD&&ses&&ses.ver)queuePush();
+           curK="";home();burst(70);vib(40);
+           toast(t?"✨ Routine prête, bonne journée !":"✨ À toi de jouer !");
+           if(!CLOUD&&!rd(CFGSEEN)){wr(CFGSEEN,"1");setTimeout(showCfg,900)}}
+          $("tstage").addEventListener("click",e=>{
+           const c=e.target.closest?e.target.closest(".tc"):null;if(!c)return;
+           tsel=c.dataset.k;vib(20);
+           const a=document.querySelectorAll(".tc");for(let q=0;q<a.length;q++)a[q].classList.toggle("sel",a[q]===c)});
+          $("tstage").addEventListener("touchstart",e=>{tx0=e.touches[0].clientX},{passive:true});
+          $("tstage").addEventListener("touchend",e=>{if(tx0==null)return;const dx=e.changedTouches[0].clientX-tx0;tx0=null;if(dx<-50)tNext();else if(dx>50)tBack()},{passive:true});
+          $("tnext").onclick=tNext;$("tback").onclick=tBack;$("tskip").onclick=()=>endTour(false);
+
+          /* ---------- Réglage Supabase dans l'app ---------- */
+          function showCfg(){$("cm").textContent="";$("cfg").classList.add("on")}
+          $("cok").onclick=()=>{
+           let u=$("ck").value.trim().replace(/\/+$/,""),k=$("cp").value.trim();
+           const m=/^https:\/\/([a-z0-9]+)\.supabase\.co/.exec(u);
+           if(m)u="https://"+m[1]+".supabase.co";
+           else if(/^[a-z0-9]{15,}$/.test(u))u="https://"+u+".supabase.co";
+           else{$("cm").textContent="URL invalide. Format : https://xxxx.supabase.co";return}
+           if(!sbKeyOk(k)){$("cm").textContent="Clé invalide : utilise la clé « anon / publishable », jamais la clé secrète.";return}
+           wr("routine-sbu",u);wr("routine-sbk",k);location.reload()};
+          $("ccl").onclick=()=>$("cfg").classList.remove("on");
+          $("m4").onclick=()=>{closeMenu();showCfg()};
+          $("m5").onclick=()=>{closeMenu();startTour(true)};
           $("ago").onclick=submit;
           $("asw").onclick=()=>{setMode(mode==="signup"?"login":"signup");msg("")};
           $("afg").onclick=forgot;
-          $("ach").onclick=checkVer;
+          $("acv").onclick=verifyCode;
+          $("ach").onclick=()=>checkVer(false);
           $("are").onclick=resend;
           $("alo").onclick=()=>logout();
+          $("rgo").onclick=doReset;
+          $("rcl").onclick=()=>{linkReset=false;showAuth("login")};
           $("m3").onclick=()=>logout();
+          $("eye").onclick=()=>{const p=$("ap");p.type=p.type==="password"?"text":"password";$("eye").textContent=p.type==="password"?"👁":"🙈"};
+          $("ap").addEventListener("input",showStr);
           $("ap").addEventListener("keydown",e=>{if(e.key==="Enter")submit()});
-          document.addEventListener("visibilitychange",()=>{if(!document.hidden&&CLOUD&&ses&&ses.ver&&!pushT&&Date.now()-lastPull>30000)pull()});
+          $("acd").addEventListener("keydown",e=>{if(e.key==="Enter")verifyCode()});
+          $("rpw").addEventListener("keydown",e=>{if(e.key==="Enter")doReset()});
+          document.addEventListener("visibilitychange",()=>{
+           if(document.hidden||!CLOUD)return;
+           if(!ses){if(pendEmail&&pendPw&&$("auth").classList.contains("on"))checkVer(true);return}
+           if(!pushT&&Date.now()-lastPull>30000)pull()});
           render();persist();showRt(location.hash==="#routine");authInit();
           setInterval(()=>{tick();home()},1000);
           </script>
@@ -1888,18 +2193,39 @@ jobs:
               <foreground android:drawable="@drawable/ic_fg"/>
           </adaptive-icon>
           EOF_8
-      - name: Configurer Firebase (comptes en ligne)
+      - name: Configurer Supabase (comptes en ligne)
         env:
-          FB_API_KEY: ${{ vars.FB_API_KEY }}
-          FB_PROJECT_ID: ${{ vars.FB_PROJECT_ID }}
+          VAR_URL: ${{ vars.SUPA_URL }}
+          VAR_KEY: ${{ vars.SUPA_KEY }}
         run: |
           python3 - <<'PY'
-          import os
+          import os, re, sys, json, base64
+          url = (os.environ.get("VAR_URL") or os.environ.get("SUPABASE_URL") or "").strip().rstrip("/")
+          key = (os.environ.get("VAR_KEY") or os.environ.get("SUPABASE_KEY") or "").strip()
+          m = re.match(r"^https://([a-z0-9]+)\.supabase\.co", url)
+          if m:
+              url = "https://" + m.group(1) + ".supabase.co"
+          elif re.fullmatch(r"[a-z0-9]{15,}", url):
+              url = "https://" + url + ".supabase.co"
+          else:
+              url = ""
+          def role(k):
+              try:
+                  p = k.split(".")[1]
+                  p += "=" * (-len(p) % 4)
+                  return json.loads(base64.urlsafe_b64decode(p)).get("role", "")
+              except Exception:
+                  return ""
+          if key.startswith("sb_secret_") or role(key) == "service_role":
+              print("::error::La cle fournie est une cle SECRETE (service_role). Utilise la cle anon / publishable.")
+              sys.exit(1)
+          if not (re.fullmatch(r"sb_publishable_[\w-]{10,}", key) or role(key) == "anon"):
+              key = ""
           p = "app/src/main/assets/index.html"
           t = open(p, encoding="utf-8").read()
-          t = t.replace("__FB_API_KEY__", os.environ.get("FB_API_KEY", "").strip())
-          t = t.replace("__FB_PROJECT_ID__", os.environ.get("FB_PROJECT_ID", "").strip())
+          t = t.replace("__SB_URL__", url).replace("__SB_KEY__", key)
           open(p, "w", encoding="utf-8").write(t)
+          print("Supabase :", "configure" if url and key else "non configure (mode sans compte)")
           PY
       - name: Version web (GitHub Pages)
         continue-on-error: true
@@ -1909,16 +2235,21 @@ jobs:
       - name: Cle de signature
         env:
           KS_B64: ${{ secrets.KEYSTORE_B64 }}
+          KS_PASS_SECRET: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          if [ -z "$KS_B64" ]; then
-            echo "::error::Secret KEYSTORE_B64 manquant. Ajoute les secrets KEYSTORE_B64 et KEYSTORE_PASSWORD (Settings > Secrets and variables > Actions)."
-            exit 1
+          if [ -n "$KS_B64" ] && [ -n "$KS_PASS_SECRET" ]; then
+            echo "Cle de signature : secrets GitHub"
+            PASS="$KS_PASS_SECRET"
+          else
+            echo "Cle de signature : cle integree (aucun secret configure)"
+            KS_B64="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"
+            PASS="NlXmfWJAM9ctuRZofPV0pUUU"
           fi
           echo "$KS_B64" | tr -d ' \n\r' | base64 -d > "$RUNNER_TEMP/routine.p12"
+          echo "KS_PASS=$PASS" >> "$GITHUB_ENV"
       - name: Compiler
         env:
           KS_FILE: ${{ runner.temp }}/routine.p12
-          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
           KS_ALIAS: routine
           VC: ${{ github.run_number }}
         run: gradle assembleRelease --no-daemon
