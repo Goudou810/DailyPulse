@@ -5,8 +5,8 @@ on:
 permissions:
   contents: write
 env:
-  SUPABASE_URL: "https://vklcgzwzxbwpjleepsdy.supabase.co"
-  SUPABASE_KEY: "sb_publishable_o-DQCrukTQW6H55usOIJyQ_Qy7R9l2z"
+  FIREBASE_API_KEY: "AIzaSyDtFcETvYya_bIZnThFqPZm39Kvi5hLcx0"
+  FIREBASE_PROJECT_ID: "goudou-9127b"
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -1564,11 +1564,14 @@ jobs:
           .tc .e{font-size:26px;display:block}
           .tc b{display:block;margin-top:2px}
           .tc small{color:var(--mu);font-size:12px}
-          .ac #acd,.ac #rcd{text-align:center;letter-spacing:6px;font-size:20px}
+          #splash{position:fixed;inset:0;z-index:100;background:#070b1c;display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+          #splash.off{opacity:0;pointer-events:none}
+          #splash span{font-size:56px;animation:bob 2.2s ease-in-out infinite}
           @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
           </style>
           </head>
           <body>
+          <div id="splash"><span>⏱️</span></div>
           <div class="fx" id="fx"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
 
           <div id="home" class="pg"><div class="wrap">
@@ -1639,9 +1642,9 @@ jobs:
           <div id="cfg" class="au"><div class="ac">
            <div class="al">☁️</div>
            <h2>Activer les comptes en ligne</h2>
-           <p class="sub">Colle l'URL de ton projet Supabase et sa clé « anon / publishable » (Project Settings → API). Jamais la clé secrète.</p>
-           <input id="ck" placeholder="URL (https://xxxx.supabase.co)" autocapitalize="none" autocorrect="off" spellcheck="false">
-           <input id="cp" placeholder="Clé anon / publishable" autocapitalize="none" autocorrect="off" spellcheck="false">
+           <p class="sub">Colle les 2 valeurs de ton projet Firebase (Paramètres du projet → Général).</p>
+           <input id="ck" placeholder="Clé API web (AIza…)" autocapitalize="none" autocorrect="off" spellcheck="false">
+           <input id="cp" placeholder="ID du projet (ex : mon-projet-123)" autocapitalize="none" autocorrect="off" spellcheck="false">
            <button class="b p" id="cok">Enregistrer</button>
            <button class="lk" id="ccl">Plus tard</button>
            <div class="am" id="cm"></div>
@@ -1660,17 +1663,9 @@ jobs:
             <button class="lk" id="afg">Mot de passe oublié ?</button>
            </div>
            <div id="av" style="display:none">
-            <input id="acd" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code (si l'email en contient un)">
-            <button class="b p" id="acv">Valider le code</button>
-            <button class="b" id="ach">J'ai cliqué sur le lien</button>
+            <button class="b p" id="ach">J'ai vérifié mon email</button>
             <button class="b" id="are">Renvoyer l'email</button>
             <button class="lk" id="alo">Changer de compte</button>
-           </div>
-           <div id="ar" style="display:none">
-            <input id="rcd" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code reçu par email">
-            <input id="rpw" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password">
-            <button class="b p" id="rgo">Changer le mot de passe</button>
-            <button class="lk" id="rcl">Retour</button>
            </div>
            <div class="am" id="am"></div>
           </div></div>
@@ -1802,6 +1797,8 @@ jobs:
            if(y){const cy=cat(y.t);$("ne").textContent=cy.e;$("nn").textContent=y.t;$("nw").textContent="à "+y.s+" · durée "+fmt(mn(y.e)-mn(y.s))}
           }
           /* ---------- Réactivité : toasts, confettis, vibrations ---------- */
+          function splashOff(){const e=$("splash");if(e)e.classList.add("off")}
+          setTimeout(splashOff,3000);
           function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
           function vib(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
           let toastT=0;
@@ -1830,64 +1827,54 @@ jobs:
           document.addEventListener("pointermove",e=>{$("fx").style.transform="translate("+((e.clientX/innerWidth-.5)*24)+"px,"+((e.clientY/innerHeight-.5)*24)+"px)"});
           $("ic").onclick=e=>{const r=e.target.getBoundingClientRect();burst(40,r.left+r.width/2,r.top+r.height/2);vib(25)};
 
-          /* ---------- Compte + sauvegarde en ligne (Supabase, API REST) ---------- */
-          function sbKeyOk(k){
-           if(/^sb_publishable_[\w-]{10,}$/.test(k))return true;
-           const m=/^eyJ[\w-]+\.([\w-]+)\.[\w-]+$/.exec(k);if(!m)return false;
-           try{return JSON.parse(atob(m[1].replace(/-/g,"+").replace(/_/g,"/"))).role==="anon"}catch(e){return false}}
-          const SB_URL=/^https:\/\/[a-z0-9]+\.supabase\.co$/.test("__SB_URL__")?"__SB_URL__":(rd("routine-sbu")||"");
-          const SB_KEY=sbKeyOk("__SB_KEY__")?"__SB_KEY__":(rd("routine-sbk")||"");
-          const CLOUD=/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL)&&sbKeyOk(SB_KEY);
-          const SES="routine-session",PEND="routine-pend",OWN="routine-owner",TS="routine-ts",ONB="routine-onb",CFGSEEN="routine-cfgseen";
+          /* ---------- Compte + sauvegarde en ligne (Firebase, API REST) ---------- */
+          const FB_KEY=/^AIza/.test("__FB_API_KEY__")?"__FB_API_KEY__":(rd("routine-fbk")||"");
+          const FB_PROJ=/^[a-z0-9][a-z0-9-]{3,}$/.test("__FB_PROJECT_ID__")?"__FB_PROJECT_ID__":(rd("routine-fbp")||"");
+          const CLOUD=/^AIza[\w-]{30,}$/.test(FB_KEY)&&/^[a-z0-9][a-z0-9-]{3,}$/.test(FB_PROJ);
+          const SES="routine-session",OWN="routine-owner",TS="routine-ts",ONB="routine-onb",CFGSEEN="routine-cfgseen";
           const HAD_LOCAL=rd(KEY)!==null;
-          const AUTH_BAD=/refresh_token|session_not_found|session_expired|invalid_grant|user_not_found|user_banned|bad_jwt|invalid refresh token/i;
-          const ERR={invalid_credentials:"Email ou mot de passe incorrect.",user_already_exists:"Cet email a déjà un compte.",email_exists:"Cet email a déjà un compte.",weak_password:"Mot de passe trop faible (6 caractères minimum).",email_address_invalid:"Email invalide.",validation_failed:"Email ou mot de passe invalide.",over_email_send_rate_limit:"Trop d'envois. Réessaie dans une minute.",over_request_rate_limit:"Trop d'essais. Réessaie dans quelques minutes.",otp_expired:"Code invalide ou expiré.",signup_disabled:"Les inscriptions sont désactivées.",email_provider_disabled:"Connexion par email désactivée dans Supabase.",user_banned:"Ce compte est désactivé.",same_password:"Choisis un autre mot de passe.",email_not_confirmed:"Email pas encore vérifié."};
-          let ses=null,idTok="",idExp=0,pushT=0,busy=false,mode="login",lastPull=0,pollT=0,onb=false,hadCloud=false,pendEmail="",pendPw="",refP=null,linkReset=false;
+          const IDT="https://identitytoolkit.googleapis.com/v1/accounts:";
+          const AUTH_BAD=/TOKEN_EXPIRED|USER_NOT_FOUND|USER_DISABLED|INVALID_REFRESH_TOKEN|CREDENTIAL_TOO_OLD|INVALID_GRANT/;
+          const ERR={EMAIL_EXISTS:"Cet email a déjà un compte.",EMAIL_NOT_FOUND:"Email ou mot de passe incorrect.",INVALID_PASSWORD:"Email ou mot de passe incorrect.",INVALID_LOGIN_CREDENTIALS:"Email ou mot de passe incorrect.",INVALID_EMAIL:"Email invalide.",MISSING_PASSWORD:"Entre ton mot de passe.",USER_DISABLED:"Ce compte est désactivé.",TOO_MANY_ATTEMPTS_TRY_LATER:"Trop d'essais. Réessaie dans quelques minutes.",OPERATION_NOT_ALLOWED:"Connexion par email désactivée dans Firebase."};
+          let ses=null,idTok="",idExp=0,pushT=0,busy=false,mode="login",lastPull=0,pollT=0,onb=false,hadCloud=false;
           function rd(k){try{return localStorage.getItem(k)}catch(e){return null}}
           function wr(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}}
           function nm(){if(!ses||!ses.email)return"";const n=String(ses.email).split("@")[0].replace(/[._\d-]+/g," ").trim().split(" ")[0]||"";return n?n.charAt(0).toUpperCase()+n.slice(1):""}
-          function errMsg(e){
-           if(!e||e.code===undefined)return"Erreur réseau. Vérifie ta connexion.";
-           const m=String(e.message||"");
-           if(ERR[e.code])return ERR[e.code];
-           if(/password should|weak/i.test(m))return"Mot de passe trop faible (6 caractères minimum).";
-           if(/security purposes|rate limit/i.test(m)||e.status===429)return"Trop d'essais. Réessaie dans une minute.";
-           if(/expired|invalid/i.test(m)&&/token|otp|code/i.test(m))return"Code invalide ou expiré.";
-           return"Erreur : "+m}
-          function syncErr(e){
-           if(e&&(e.status===404||e.code==="PGRST205"))return"⚠ Table « routines » introuvable (SQL à lancer)";
-           if(e&&(e.status===401||e.status===403))return"⚠ Accès refusé (policies RLS)";
-           return"⚠ Hors ligne : données locales"}
-          async function api(path,body,tok,method,extra){
-           const h={"apikey":SB_KEY,"Content-Type":"application/json"};
-           if(tok)h.Authorization="Bearer "+tok;
-           if(extra)for(const k in extra)h[k]=extra[k];
-           const r=await fetch(SB_URL+path,{method:method||"POST",headers:h,body:body==null?undefined:JSON.stringify(body)});
-           const t=await r.text();let j={};try{j=t?JSON.parse(t):{}}catch(e){}
-           if(!r.ok){const e=new Error(j.msg||j.message||j.error_description||j.error||("HTTP"+r.status));e.code=String(j.error_code||j.code||j.error||"");e.status=r.status;throw e}
+          function errMsg(m){m=String(m||"");if(m.indexOf("WEAK_PASSWORD")===0)return"Mot de passe trop faible (6 caractères minimum).";const k=Object.keys(ERR).find(x=>m.indexOf(x)===0);return k?ERR[k]:"Erreur réseau ou serveur. Vérifie ta connexion."}
+          async function api(url,body){
+           const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","X-Firebase-Locale":"fr"},body:JSON.stringify(body)});
+           const j=await r.json().catch(()=>({}));
+           if(!r.ok)throw new Error((j.error&&j.error.message)||("HTTP"+r.status));
            return j}
           function setSes(j){
-           const o=ses||{},u=j.user||{};
-           ses={uid:u.id||o.uid,email:u.email||o.email,rt:j.refresh_token||o.rt,ver:!!o.ver&&(!u.id||u.id===o.uid)};
-           idTok=j.access_token||"";idExp=Date.now()+((+j.expires_in||3600)-60)*1000;
+           const o=ses||{};
+           ses={uid:j.localId||j.user_id||o.uid,email:j.email||o.email,rt:j.refreshToken||j.refresh_token||o.rt,ver:!!o.ver&&(!j.localId||j.localId===o.uid)};
+           idTok=j.idToken||j.id_token||"";idExp=Date.now()+((+j.expiresIn||+j.expires_in||3600)-60)*1000;
            wr(SES,JSON.stringify(ses))}
           async function token(force){
            if(!ses)throw new Error("NOAUTH");
            if(!force&&idTok&&Date.now()<idExp)return idTok;
-           if(!refP)refP=(async()=>{try{const j=await api("/auth/v1/token?grant_type=refresh_token",{refresh_token:ses.rt});setSes(j);return idTok}finally{refP=null}})();
-           return refP}
+           const r=await fetch("https://securetoken.googleapis.com/v1/token?key="+FB_KEY,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"grant_type=refresh_token&refresh_token="+encodeURIComponent(ses.rt)});
+           const j=await r.json().catch(()=>({}));
+           if(!r.ok)throw new Error((j.error&&j.error.message)||("HTTP"+r.status));
+           setSes(j);return idTok}
           async function isVerified(){
-           const t=await token();
-           const u=await api("/auth/v1/user",null,t,"GET");
-           return !!(u&&(u.email_confirmed_at||u.confirmed_at))}
+           const t=await token(true);
+           const j=await api(IDT+"lookup?key="+FB_KEY,{idToken:t});
+           const u=j.users&&j.users[0];return !!(u&&u.emailVerified)}
+          function docUrl(){return"https://firestore.googleapis.com/v1/projects/"+FB_PROJ+"/databases/(default)/documents/users/"+ses.uid}
           async function cloudGet(){
            const t=await token();
-           const j=await api("/rest/v1/routines?user_id=eq."+ses.uid+"&select=routine,ts,onb",null,t,"GET");
-           const r=Array.isArray(j)?j[0]:null;if(!r)return null;
-           return{routine:Array.isArray(r.routine)&&r.routine.length?r.routine:null,ts:+r.ts||0,onb:!!r.onb}}
+           const r=await fetch(docUrl(),{headers:{Authorization:"Bearer "+t}});
+           if(r.status===404)return null;
+           if(!r.ok)throw new Error("HTTP"+r.status);
+           const f=(await r.json()).fields||{};
+           return{routine:(f.routine&&f.routine.stringValue)||"",ts:+((f.ts&&f.ts.integerValue)||0),onb:!!(f.onb&&f.onb.booleanValue)}}
           async function cloudPut(){
            const t=await token();
-           await api("/rest/v1/routines?on_conflict=user_id",{user_id:ses.uid,routine:data,ts:+rd(TS)||Date.now(),onb:!!onb},t,"POST",{Prefer:"resolution=merge-duplicates,return=minimal"})}
+           const ts=+rd(TS)||Date.now();
+           const r=await fetch(docUrl(),{method:"PATCH",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({fields:{routine:{stringValue:JSON.stringify(data)},ts:{integerValue:String(ts)},onb:{booleanValue:!!onb}}})});
+           if(!r.ok)throw new Error("HTTP"+r.status)}
           function setSync(t){$("sy").textContent=t||""}
           function updWho(){$("who").style.display=ses?"":"none";$("m3").style.display=ses?"":"none";$("m4").style.display=CLOUD?"none":"";$("wm").textContent=ses?ses.email:""}
           function queuePush(){
@@ -1897,19 +1884,19 @@ jobs:
           async function pull(){
            lastPull=Date.now();
            let c=null;
-           try{c=await cloudGet()}catch(e){setSync(syncErr(e));return}
+           try{c=await cloudGet()}catch(e){setSync(/403/.test(String(e.message))?"⚠ Accès refusé (règles Firestore)":"⚠ Hors ligne : données locales");return}
            const lts=+rd(TS)||0,own=rd(OWN);
            hadCloud=!!(c&&c.routine);
            if(c&&c.onb)onb=true;
            try{
             if(c&&c.routine){
              if(own===ses.uid&&lts>c.ts)await cloudPut();
-             else{data=c.routine;wr(TS,String(c.ts));lastBlk=null;persist();render()}
+             else{const d=JSON.parse(c.routine);if(Array.isArray(d)){data=d;wr(TS,String(c.ts));lastBlk=null;persist();render()}}
             }else{
              if(own!==ses.uid){data=fresh();wr(TS,String(Date.now()))}
              lastBlk=null;persist();render();await cloudPut()}
             wr(OWN,ses.uid);setSync("✓ Synchronisé")
-           }catch(e){setSync(syncErr(e))}}
+           }catch(e){setSync("⚠ Synchronisation impossible")}}
           function msg(t,ok){
            const m=$("am");m.textContent=t||"";m.className="am"+(ok?" ok":"");
            if(t&&!ok){const c=$("acard");c.classList.remove("sh");void c.offsetWidth;c.classList.add("sh");vib(60)}}
@@ -1928,26 +1915,23 @@ jobs:
            $("afg").style.display=s?"none":"";
            $("ap").setAttribute("autocomplete",s?"new-password":"current-password");
            showStr()}
-          function poll(on){clearInterval(pollT);pollT=0;if(on)pollT=setInterval(()=>{if(!document.hidden&&pendPw)checkVer(true)},15000)}
+          function poll(on){clearInterval(pollT);pollT=0;if(on)pollT=setInterval(()=>{if(!document.hidden)checkVer(true)},4000)}
           function showAuth(v){
            $("auth").classList.toggle("on",!!v);
            $("af").style.display=v==="login"?"":"none";
            $("av").style.display=v==="verify"?"":"none";
-           $("ar").style.display=v==="reset"?"":"none";
-           $("ali").textContent=v==="verify"?"📨":v==="reset"?"🔑":"⏱️";
+           $("ali").textContent=v==="verify"?"📨":"⏱️";
            poll(v==="verify");
            if(v==="login")setMode(mode);
-           if(v==="verify"){$("at").textContent="Vérifie ton email";$("as").textContent="Un email a été envoyé à "+pendEmail+". Clique sur le lien qu'il contient, puis reviens ici : l'écran se débloque tout seul. Si l'email contient un code, entre-le ci-dessous."}
-           if(v==="reset"){$("at").textContent="Nouveau mot de passe";$("rcd").style.display=linkReset?"none":"";$("as").textContent=linkReset?"Choisis ton nouveau mot de passe.":"Entre le code reçu à "+pendEmail+" (ou ouvre le lien de l'email depuis la version web) et choisis un nouveau mot de passe."}
+           if(v==="verify"){$("at").textContent="Vérifie ton email";$("as").textContent="Un email de confirmation a été envoyé à "+(ses?ses.email:"")+". Clique sur le lien : cet écran se débloque tout seul."}
            msg("")}
           async function enter(first){
-           ses.ver=true;wr(SES,JSON.stringify(ses));wr(PEND,null);pendPw="";linkReset=false;
+           ses.ver=true;wr(SES,JSON.stringify(ses));
            onb=rd(ONB)===ses.uid;
            showAuth("");updWho();
            if(first){burst(120);vib([60,40,60]);toast("✅ Email vérifié, bienvenue "+nm()+" !",3200)}
            await pull();
            if(!onb)setTimeout(()=>startTour(hadCloud),700)}
-          function goVerify(em,pw){pendEmail=em;pendPw=pw||"";wr(PEND,em);ses=null;wr(SES,null);showAuth("verify")}
           async function submit(){
            if(busy)return;
            const em=$("ae").value.trim(),pw=$("ap").value;
@@ -1955,90 +1939,51 @@ jobs:
            busy=true;msg("Un instant…",true);
            try{
             if(mode==="signup"){
-             const j=await api("/auth/v1/signup",{email:em,password:pw});
-             if(j.access_token){msg("La confirmation par email est désactivée dans Supabase (Authentication → Sign In / Providers → Email → Confirm email).");busy=false;return}
-             if(j.identities&&j.identities.length===0){const e=new Error("exists");e.code="user_already_exists";throw e}
-             goVerify(em,pw);msg("Email envoyé. Pense à regarder tes spams.",true)
+             const j=await api(IDT+"signUp?key="+FB_KEY,{email:em,password:pw,returnSecureToken:true});
+             ses=null;setSes(j);
+             showAuth("verify");
+             try{await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"VERIFY_EMAIL",idToken:idTok});msg("Email envoyé. Pense à regarder tes spams.",true)}
+             catch(e2){msg("Compte créé, mais l'email n'a pas pu être envoyé. Touche « Renvoyer l'email ».")}
             }else{
-             try{
-              const j=await api("/auth/v1/token?grant_type=password",{email:em,password:pw});
-              ses=null;setSes(j);
-              if(await isVerified())await enter(false);
-              else{goVerify(em,pw);msg("Ton email n'est pas encore vérifié.")}
-             }catch(e){
-              if(e&&e.code==="email_not_confirmed"){goVerify(em,pw);msg("Ton email n'est pas encore vérifié. Clique sur le lien reçu, ou renvoie l'email.")}
-              else throw e}
+             const j=await api(IDT+"signInWithPassword?key="+FB_KEY,{email:em,password:pw,returnSecureToken:true});
+             ses=null;setSes(j);
+             if(await isVerified())await enter(false);
+             else{showAuth("verify");msg("Ton email n'est pas encore vérifié. Touche « Renvoyer l'email » si besoin.")}
             }
-           }catch(e){msg(errMsg(e))}
-           busy=false}
-          async function verifyCode(){
-           if(busy)return;
-           const code=$("acd").value.replace(/\s/g,"");
-           if(!/^\d{4,10}$/.test(code)){msg("Entre le code reçu par email (chiffres).");return}
-           busy=true;msg("Vérification…",true);
-           try{const j=await api("/auth/v1/verify",{type:"signup",email:pendEmail,token:code});ses=null;setSes(j);await enter(true)}
-           catch(e){msg(errMsg(e))}
+           }catch(e){msg(errMsg(e.message))}
            busy=false}
           async function checkVer(q){
-           if(busy)return;
-           if(!pendPw){if(!q){showAuth("login");$("ae").value=pendEmail;msg("Si tu as cliqué sur le lien, connecte-toi avec ton mot de passe.",true)}return}
-           busy=true;if(!q)msg("Vérification…",true);
-           try{const j=await api("/auth/v1/token?grant_type=password",{email:pendEmail,password:pendPw});ses=null;setSes(j);await enter(true)}
-           catch(e){if(!q)msg(e&&e.code==="email_not_confirmed"?"Pas encore vérifié. Clique sur le lien de l'email ou entre le code.":errMsg(e))}
+           if(busy)return;busy=true;if(!q)msg("Vérification…",true);
+           try{if(await isVerified()){poll(false);await enter(true)}else if(!q)msg("Pas encore vérifié. Ouvre le lien reçu par email, puis réessaie.")}
+           catch(e){if(!q)msg(errMsg(e.message))}
            busy=false}
           async function resend(){
            if(busy)return;busy=true;
-           try{await api("/auth/v1/resend",{type:"signup",email:pendEmail});msg("Email renvoyé à "+pendEmail+".",true)}
-           catch(e){msg(errMsg(e))}
+           try{const t=await token();await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"VERIFY_EMAIL",idToken:t});msg("Email renvoyé à "+ses.email+".",true)}
+           catch(e){msg(errMsg(e.message))}
            busy=false}
           async function forgot(){
            const em=$("ae").value.trim();
            if(!em){msg("Entre d'abord ton email ci-dessus.");return}
-           try{await api("/auth/v1/recover",{email:em});pendEmail=em;linkReset=false;showAuth("reset");msg("Si ce compte existe, un email a été envoyé.",true)}
-           catch(e){msg(errMsg(e))}}
-          async function doReset(){
-           if(busy)return;
-           const code=$("rcd").value.replace(/\s/g,""),pw=$("rpw").value;
-           if(!linkReset&&!/^\d{4,10}$/.test(code)){msg("Entre le code reçu par email.");return}
-           if(pw.length<6){msg("Mot de passe trop court (6 caractères minimum).");return}
-           busy=true;msg("Un instant…",true);
-           try{
-            if(!linkReset){const j=await api("/auth/v1/verify",{type:"recovery",email:pendEmail,token:code});ses=null;setSes(j)}
-            await api("/auth/v1/user",{password:pw},idTok,"PUT");
-            $("rpw").value="";$("rcd").value="";
-            await enter(false);toast("🔑 Mot de passe changé")
-           }catch(e){msg(errMsg(e))}
-           busy=false}
-          async function fromLink(){
-           const h=location.hash||"";if(h.indexOf("access_token=")<0)return false;
-           const p=new URLSearchParams(h.replace(/^#/,""));
-           try{history.replaceState(null,"",location.pathname)}catch(e){}
-           const at=p.get("access_token"),rt=p.get("refresh_token");if(!at||!rt)return false;
-           try{
-            const u=await api("/auth/v1/user",null,at,"GET");
-            ses=null;setSes({access_token:at,refresh_token:rt,expires_in:+p.get("expires_in")||3600,user:u});
-            if(p.get("type")==="recovery"){linkReset=true;pendEmail=u.email||"";showAuth("reset");return true}
-            await enter(true);return true
-           }catch(e){return false}}
+           try{await api(IDT+"sendOobCode?key="+FB_KEY,{requestType:"PASSWORD_RESET",email:em});msg("Si ce compte existe, un email de réinitialisation a été envoyé.",true)}
+           catch(e){if(String(e.message).indexOf("EMAIL_NOT_FOUND")===0)msg("Si ce compte existe, un email de réinitialisation a été envoyé.",true);else msg(errMsg(e.message))}}
           async function logout(){
            try{if(ses&&ses.ver&&pushT){clearTimeout(pushT);pushT=0;await cloudPut()}}catch(e){}
-           try{if(idTok)await api("/auth/v1/logout?scope=local",null,idTok)}catch(e){}
-           ses=null;idTok="";pendPw="";pendEmail="";linkReset=false;wr(SES,null);wr(PEND,null);wr(OWN,null);wr(TS,null);wr(KEY,null);
+           ses=null;idTok="";wr(SES,null);wr(OWN,null);wr(TS,null);wr(KEY,null);
            $("tour").classList.remove("on");clearInterval(tTimer);
            data=[];lastBlk=null;persist();render();updWho();setSync("");closeMenu();$("ap").value="";showAuth("login")}
           async function authInit(){
            updWho();
-           if(!CLOUD){if(rd(ONB)!=="local")setTimeout(()=>startTour(HAD_LOCAL),600);return}
-           if(await fromLink())return;
+           if(!CLOUD){splashOff();if(rd(ONB)!=="local")setTimeout(()=>startTour(HAD_LOCAL),600);return}
            let s=null;try{s=JSON.parse(rd(SES))}catch(e){}
-           if(s&&s.uid&&s.rt&&s.ver)ses=s;
-           pendEmail=rd(PEND)||"";
-           if(!ses){data=[];lastBlk=null;persist();render();showAuth(pendEmail?"verify":"login");return}
+           if(s&&s.uid&&s.rt)ses=s;
+           if(!ses||!ses.ver){data=[];lastBlk=null;persist();render();showAuth(ses?"verify":"login");splashOff();return}
            updWho();
+           splashOff();
            try{
             if(await isVerified()){onb=rd(ONB)===ses.uid;await pull();if(!onb)startTour(hadCloud)}
-            else{ses=null;wr(SES,null);data=[];lastBlk=null;persist();render();showAuth("login")}
-           }catch(e){if(AUTH_BAD.test(String(e&&e.code)+" "+String(e&&e.message)))logout();else setSync("⚠ Hors ligne : données locales")}}
+            else{ses.ver=false;wr(SES,JSON.stringify(ses));data=[];lastBlk=null;persist();render();showAuth("verify")}
+           }catch(e){if(AUTH_BAD.test(String(e.message)))logout();else setSync("⚠ Hors ligne : données locales")}}
 
           /* ---------- Guide de bienvenue ---------- */
           const TPL=[
@@ -2101,38 +2046,31 @@ jobs:
           $("tstage").addEventListener("touchend",e=>{if(tx0==null)return;const dx=e.changedTouches[0].clientX-tx0;tx0=null;if(dx<-50)tNext();else if(dx>50)tBack()},{passive:true});
           $("tnext").onclick=tNext;$("tback").onclick=tBack;$("tskip").onclick=()=>endTour(false);
 
-          /* ---------- Réglage Supabase dans l'app ---------- */
+          /* ---------- Réglage Firebase dans l'app ---------- */
           function showCfg(){$("cm").textContent="";$("cfg").classList.add("on")}
           $("cok").onclick=()=>{
-           let u=$("ck").value.trim().replace(/\/+$/,""),k=$("cp").value.trim();
-           const m=/^https:\/\/([a-z0-9]+)\.supabase\.co/.exec(u);
-           if(m)u="https://"+m[1]+".supabase.co";
-           else if(/^[a-z0-9]{15,}$/.test(u))u="https://"+u+".supabase.co";
-           else{$("cm").textContent="URL invalide. Format : https://xxxx.supabase.co";return}
-           if(!sbKeyOk(k)){$("cm").textContent="Clé invalide : utilise la clé « anon / publishable », jamais la clé secrète.";return}
-           wr("routine-sbu",u);wr("routine-sbk",k);location.reload()};
+           const k=$("ck").value.trim(),p=$("cp").value.trim();
+           if(!/^AIza[\w-]{30,}$/.test(k)){$("cm").textContent="La clé API doit commencer par AIza…";return}
+           if(!/^[a-z0-9][a-z0-9-]{3,}$/.test(p)){$("cm").textContent="ID de projet invalide (minuscules, chiffres, tirets).";return}
+           wr("routine-fbk",k);wr("routine-fbp",p);location.reload()};
           $("ccl").onclick=()=>$("cfg").classList.remove("on");
           $("m4").onclick=()=>{closeMenu();showCfg()};
           $("m5").onclick=()=>{closeMenu();startTour(true)};
+
           $("ago").onclick=submit;
           $("asw").onclick=()=>{setMode(mode==="signup"?"login":"signup");msg("")};
           $("afg").onclick=forgot;
-          $("acv").onclick=verifyCode;
           $("ach").onclick=()=>checkVer(false);
           $("are").onclick=resend;
           $("alo").onclick=()=>logout();
-          $("rgo").onclick=doReset;
-          $("rcl").onclick=()=>{linkReset=false;showAuth("login")};
           $("m3").onclick=()=>logout();
           $("eye").onclick=()=>{const p=$("ap");p.type=p.type==="password"?"text":"password";$("eye").textContent=p.type==="password"?"👁":"🙈"};
           $("ap").addEventListener("input",showStr);
           $("ap").addEventListener("keydown",e=>{if(e.key==="Enter")submit()});
-          $("acd").addEventListener("keydown",e=>{if(e.key==="Enter")verifyCode()});
-          $("rpw").addEventListener("keydown",e=>{if(e.key==="Enter")doReset()});
           document.addEventListener("visibilitychange",()=>{
-           if(document.hidden||!CLOUD)return;
-           if(!ses){if(pendEmail&&pendPw&&$("auth").classList.contains("on"))checkVer(true);return}
-           if(!pushT&&Date.now()-lastPull>30000)pull()});
+           if(document.hidden||!CLOUD||!ses)return;
+           if(!ses.ver)checkVer(true);
+           else if(!pushT&&Date.now()-lastPull>30000)pull()});
           render();persist();showRt(location.hash==="#routine");authInit();
           setInterval(()=>{tick();home()},1000);
           </script>
@@ -2193,39 +2131,18 @@ jobs:
               <foreground android:drawable="@drawable/ic_fg"/>
           </adaptive-icon>
           EOF_8
-      - name: Configurer Supabase (comptes en ligne)
+      - name: Configurer Firebase (comptes en ligne)
         env:
-          VAR_URL: ${{ vars.SUPA_URL }}
-          VAR_KEY: ${{ vars.SUPA_KEY }}
+          VAR_KEY: ${{ vars.FB_API_KEY }}
+          VAR_PROJ: ${{ vars.FB_PROJECT_ID }}
         run: |
           python3 - <<'PY'
-          import os, re, sys, json, base64
-          url = (os.environ.get("VAR_URL") or os.environ.get("SUPABASE_URL") or "").strip().rstrip("/")
-          key = (os.environ.get("VAR_KEY") or os.environ.get("SUPABASE_KEY") or "").strip()
-          m = re.match(r"^https://([a-z0-9]+)\.supabase\.co", url)
-          if m:
-              url = "https://" + m.group(1) + ".supabase.co"
-          elif re.fullmatch(r"[a-z0-9]{15,}", url):
-              url = "https://" + url + ".supabase.co"
-          else:
-              url = ""
-          def role(k):
-              try:
-                  p = k.split(".")[1]
-                  p += "=" * (-len(p) % 4)
-                  return json.loads(base64.urlsafe_b64decode(p)).get("role", "")
-              except Exception:
-                  return ""
-          if key.startswith("sb_secret_") or role(key) == "service_role":
-              print("::error::La cle fournie est une cle SECRETE (service_role). Utilise la cle anon / publishable.")
-              sys.exit(1)
-          if not (re.fullmatch(r"sb_publishable_[\w-]{10,}", key) or role(key) == "anon"):
-              key = ""
+          import os
           p = "app/src/main/assets/index.html"
           t = open(p, encoding="utf-8").read()
-          t = t.replace("__SB_URL__", url).replace("__SB_KEY__", key)
+          t = t.replace("__FB_API_KEY__", (os.environ.get("VAR_KEY") or os.environ.get("FIREBASE_API_KEY") or "").strip())
+          t = t.replace("__FB_PROJECT_ID__", (os.environ.get("VAR_PROJ") or os.environ.get("FIREBASE_PROJECT_ID") or "").strip())
           open(p, "w", encoding="utf-8").write(t)
-          print("Supabase :", "configure" if url and key else "non configure (mode sans compte)")
           PY
       - name: Version web (GitHub Pages)
         continue-on-error: true
